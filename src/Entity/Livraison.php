@@ -9,7 +9,16 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: LivraisonRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations:[
+        "get",
+        "post"
+    ],
+    itemOperations:[
+        "get",
+        "put"
+    ]
+)]
 class Livraison
 {
     #[ORM\Id]

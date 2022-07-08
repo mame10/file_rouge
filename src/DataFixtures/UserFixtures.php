@@ -1,5 +1,4 @@
 <?php
-
 namespace App\DataFixtures;
 
 use App\Entity\User;
@@ -19,8 +18,11 @@ private UserPasswordHasherInterface $passwordHasher;
     {
         // $product = new Product();
         // $manager->persist($product);
-      /*   $user=new User();
+       /*  $user=new User();
         $user->setLogin('client@gmail.com');
+        $user->setNom('Mame');
+        $user->setPrenom('Mounina');
+
         $hashedPassword = $this->passwordHasher->hashPassword(
         $user,
         'passer'
@@ -29,6 +31,9 @@ private UserPasswordHasherInterface $passwordHasher;
         $user->setRoles(['ROLE_CLIENT']);
         $user1=new User();
         $user1->setLogin('gestionnaire@gmail.com');
+        $user->setNom('Mame');
+        $user->setPrenom('Mounina');
+        
         $hashedPassword = $this->passwordHasher->hashPassword(
         $user1,
         'passer'

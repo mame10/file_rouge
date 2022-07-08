@@ -4,8 +4,16 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
 
+
+use Symfony\Component\HttpFoundation\Response;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 
@@ -15,29 +23,56 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ApiResource(
+    collectionOperations:[
+        "get" => [
+            "method" =>"get",
+            'status'=>Response::HTTP_CREATED,
+            'normalization_context' => ['groups' => ['user:read:all']]
+        ]
+    ],
+    itemOperations:["put","get"]
+)]
 
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    #[Groups(["burger:read:all","user:read:simple","write"])]
+    protected $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    private $login;
+    #[Groups(["burger:read:all","user:read:simple","user:read:all","write"])]
+    protected $login;
 
     #[ORM\Column(type: 'json')]
-    private $roles = [];
+    #[Groups(["user:read:simple","user:read:all"])]
+    protected $roles = [];
 
     #[ORM\Column(type: 'string')]
-    private $password;
+    protected $password;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private $nom;
+    #[ORM\Column(type: 'string', length: 255,nullable:true)]
+    #[Groups(["user:read:simple","user:read:all","write"])]
+    protected $nom;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private $prenom;
+    #[ORM\Column(type: 'string', length: 255,nullable:true)]
+    #[Groups(["user:read:simple","user:read:all","write"])]
+    protected $prenom;
 
+    #[ORM\Column(type: 'string', length: 255,nullable:true)]
+    protected $token;
+
+    #[SerializedName("password")]
+    #[Groups(["write"])]
+    protected $plainPassword;
+
+    #[ORM\Column(type: 'datetime',nullable:true)]
+    #[Groups(["write"])]
+    protected $expireAt;
+
+  
     public function getId(): ?int
     {
         return $this->id;
@@ -64,7 +99,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return (string) $this->login;
     }
-
     /**
      * @see UserInterface
      */
@@ -89,6 +123,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getPassword(): string
     {
+
         return $this->password;
     }
 
@@ -131,4 +166,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(string $token): self
+    {
+        $this->token = $token;
+
+        return $this;
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    public function getExpireAt(): ?\DateTime
+    {
+        return $this->expireAt;
+    }
+
+    public function setExpireAt(\DateTime $expireAt): self
+    {
+        $this->expireAt = $expireAt;
+
+        return $this;
+    }
+
+    
 }

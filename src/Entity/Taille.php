@@ -2,40 +2,73 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\TailleRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\HttpFoundation\Response;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TailleRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations: [
+        "get" => [
+            'method' => 'get',
+            'status' => Response::HTTP_OK,
+            'normalization_context' => ['groups' => ['taille:read:simple']],
+        ],
+        "post" => [
+            "access_control" => "is_granted('ROLE_GESTIONNAIRE')",
+            "security_message" => "Vous n'avez pas access à cette Ressource",
+            'denormalization_context' => ['groups' => ['write']],
+            'normalization_context' => ['groups' => ['taille:read:all']]
+        ]
+    ],
+
+    itemOperations: [
+        "get" => [
+            'method' => 'get',
+            'normalization_context' => ['groups' => ['taille:read:all']],
+        ],
+        "put" => [
+            'method' => 'put',
+            "security" => "is_granted('ROLE_GESTIONNAIRE')",
+            "security_message" => "Vous n'avez pas access à cette Ressource",
+            'status' => Response::HTTP_OK,
+            'denormalization_context' => ['groups' => ['write']]
+        ],
+        "patch"
+    ]
+)]
 class Taille
 {
+
+    #[Groups(["menu:write","boisson:read:all","write","taille:read:all","complements"])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: 'integer')]
+    #[Groups(["taille:read:all","complements","write"])]
+    #[ORM\Column(type: 'integer',nullable:true)]
     private $prix;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(["taille:read:all","complements","write"])]
     private $libelle;
 
-    #[ORM\ManyToMany(targetEntity: Boisson::class, inversedBy: 'tailles')]
-    private $boissons;
+    #[ORM\OneToMany(mappedBy: 'taille', targetEntity: MenuTaille::class,cascade:["persist"])]
+    private $tailleMenus;
 
-    #[ORM\ManyToOne(targetEntity: Complements::class, inversedBy: 'boissons')]
-    private $complements;
+    #[ORM\OneToMany(mappedBy: 'taille', targetEntity: TailleBoisson::class,cascade:['persist'])]
+    private $tailleBoissons;
 
-    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'boissons')]
-    private $menus;
-
+   
     public function __construct()
     {
-        $this->boissons = new ArrayCollection();
-        $this->menus = new ArrayCollection();
+        $this->tailleMenus = new ArrayCollection();
+        $this->tailleBoissons = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -75,58 +108,65 @@ class Taille
         return $this->boissons;
     }
 
-    public function addBoisson(Boisson $boisson): self
+
+    /**
+     * @return Collection<int, MenuTaille>
+     */
+    public function getTailleMenus(): Collection
     {
-        if (!$this->boissons->contains($boisson)) {
-            $this->boissons[] = $boisson;
+        return $this->tailleMenus;
+    }
+
+    public function addTailleMenu(MenuTaille $tailleMenu): self
+    {
+        if (!$this->tailleMenus->contains($tailleMenu)) {
+            $this->tailleMenus[] = $tailleMenu;
+            $tailleMenu->setTaille($this);
         }
 
         return $this;
     }
 
-    public function removeBoisson(Boisson $boisson): self
+    public function removeTailleMenu(MenuTaille $tailleMenu): self
     {
-        $this->boissons->removeElement($boisson);
-
-        return $this;
-    }
-
-    public function getComplements(): ?Complements
-    {
-        return $this->complements;
-    }
-
-    public function setComplements(?Complements $complements): self
-    {
-        $this->complements = $complements;
+        if ($this->tailleMenus->removeElement($tailleMenu)) {
+            // set the owning side to null (unless already changed)
+            if ($tailleMenu->getTaille() === $this) {
+                $tailleMenu->setTaille(null);
+            }
+        }
 
         return $this;
     }
 
     /**
-     * @return Collection<int, Menu>
+     * @return Collection<int, TailleBoisson>
      */
-    public function getMenus(): Collection
+    public function getTailleBoissons(): Collection
     {
-        return $this->menus;
+        return $this->tailleBoissons;
     }
 
-    public function addMenu(Menu $menu): self
+    public function addTailleBoisson(TailleBoisson $tailleBoisson): self
     {
-        if (!$this->menus->contains($menu)) {
-            $this->menus[] = $menu;
-            $menu->addBoisson($this);
+        if (!$this->tailleBoissons->contains($tailleBoisson)) {
+            $this->tailleBoissons[] = $tailleBoisson;
+            $tailleBoisson->setTaille($this);
         }
 
         return $this;
     }
 
-    public function removeMenu(Menu $menu): self
+    public function removeTailleBoisson(TailleBoisson $tailleBoisson): self
     {
-        if ($this->menus->removeElement($menu)) {
-            $menu->removeBoisson($this);
+        if ($this->tailleBoissons->removeElement($tailleBoisson)) {
+            // set the owning side to null (unless already changed)
+            if ($tailleBoisson->getTaille() === $this) {
+                $tailleBoisson->setTaille(null);
+            }
         }
 
         return $this;
     }
+ 
 }

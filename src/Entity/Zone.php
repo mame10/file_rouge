@@ -7,26 +7,47 @@ use App\Repository\ZoneRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ZoneRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations:[
+        "get",
+        "post" =>[
+            "access_control" => "is_granted('ROLE_GESTIONNAIRE')",
+            "security_message"=>"Vous n'avez pas access à cette Ressource",
+            'denormalization_context' => ['groups' => ['write']],
+            'normalization_context' => ['groups' => ['zone:read:all']]
+        ]
+    ],
+    itemOperations:[
+        "get",
+        "put",
+        "patch"
+    ]
+)]
 class Zone
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(["write","zone:read:all"])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(["write","zone:read:all"])]
     private $nom;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(["write","zone:read:all"])]
     private $prix;
 
     #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Commande::class)]
+    #[Groups(["zone:read:all"])]
     private $commandes;
 
     #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Quartiers::class)]
+    #[Groups(["zone:read:all"])]
     private $quartiers;
 
     public function __construct()

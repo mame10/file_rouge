@@ -4,26 +4,30 @@ namespace App\Entity;
 
 use App\Entity\Menu;
 use App\Entity\Burger;
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\Entity;
-use App\Repository\CatologuesRepository;
-use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+// use Symfony\Component\Validator\Constraints\Collection;
 
-#[ORM\Entity(repositoryClass: CatologuesRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations:[
+        "get_catologue" => [
+        "method"=>"get",
+        'status' => Response::HTTP_CREATED,
+        'path'=>'catologue/',
+        // 'denormalization_context' => ['groups' => ['user:write']],
+        'normalization_context' => ['groups' => ['catologue']]
+        ]
+    ],
+        itemOperations:[]
+)]
+
 class Catologues
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private $id;
-
-    #[ORM\OneToMany(mappedBy: 'catologues', targetEntity: Burger::class)]
+    #[Groups(["catologue"])]
     private $burgers;
-
-    #[ORM\OneToMany(mappedBy: 'catologues', targetEntity: Menu::class)]
+    #[Groups(["catologue"])]
     private $menus;
 
     public function __construct()
@@ -32,68 +36,4 @@ class Catologues
         $this->menus = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return Collection<int, Burger>
-     */
-    public function getBurgers(): Collection
-    {
-        return $this->burgers;
-    }
-
-    public function addBurger(Burger $burger): self
-    {
-        if (!$this->burgers->contains($burger)) {
-            $this->burgers[] = $burger;
-            $burger->setCatologues($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBurger(Burger $burger): self
-    {
-        if ($this->burgers->removeElement($burger)) {
-            // set the owning side to null (unless already changed)
-            if ($burger->getCatologues() === $this) {
-                $burger->setCatologues(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Menu>
-     */
-    public function getMenus(): Collection
-    {
-        return $this->menus;
-    }
-
-    public function addMenu(Menu $menu): self
-    {
-        if (!$this->menus->contains($menu)) {
-            $this->menus[] = $menu;
-            $menu->setCatologues($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMenu(Menu $menu): self
-    {
-        if ($this->menus->removeElement($menu)) {
-            // set the owning side to null (unless already changed)
-            if ($menu->getCatologues() === $this) {
-                $menu->setCatologues(null);
-            }
-        }
-
-        return $this;
-    }
 }

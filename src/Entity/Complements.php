@@ -4,36 +4,32 @@ namespace App\Entity;
 
 use App\Entity\Taille;
 use App\Entity\PortionFrite;
-use Doctrine\ORM\Mapping as ORM;
-use App\Repository\ComplementsRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: ComplementsRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations:["get"=>[ 'method' => 'get',
+        'status' => Response::HTTP_OK,
+        'normalization_context' => ['groups' => ['complements']]
+         ]
+    ],
+    itemOperations:[]
+)]
+
 class Complements
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private $id;
 
-    #[ORM\OneToMany(mappedBy: 'complements', targetEntity: PortionFrite::class)]
+    #[Groups(["complements"])]
     private $portions;
-
-    #[ORM\OneToMany(mappedBy: 'complements', targetEntity: Taille::class)]
-    private $boissons;
-
+    #[Groups(["complements"])]
+    private $tailles;
     public function __construct()
     {
         $this->portions = new ArrayCollection();
-        $this->boissons = new ArrayCollection();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
+        $this->tailles = new ArrayCollection();
     }
 
     /**
@@ -48,51 +44,24 @@ class Complements
     {
         if (!$this->portions->contains($portion)) {
             $this->portions[] = $portion;
-            $portion->setComplements($this);
         }
-
-        return $this;
-    }
-
-    public function removePortion(PortionFrite $portion): self
-    {
-        if ($this->portions->removeElement($portion)) {
-            // set the owning side to null (unless already changed)
-            if ($portion->getComplements() === $this) {
-                $portion->setComplements(null);
-            }
-        }
-
         return $this;
     }
 
     /**
      * @return Collection<int, Taille>
      */
-    public function getBoissons(): Collection
+    public function getTailles(): Collection
     {
-        return $this->boissons;
+        return $this->tailles;
     }
 
-    public function addBoisson(Taille $boisson): self
+    public function addTaille(Taille $taille): self
     {
-        if (!$this->boissons->contains($boisson)) {
-            $this->boissons[] = $boisson;
-            $boisson->setComplements($this);
+        if (!$this->tailles->contains($taille)) {
+            $this->tailles[] = $taille;
         }
-
         return $this;
     }
 
-    public function removeBoisson(Taille $boisson): self
-    {
-        if ($this->boissons->removeElement($boisson)) {
-            // set the owning side to null (unless already changed)
-            if ($boisson->getComplements() === $this) {
-                $boisson->setComplements(null);
-            }
-        }
-
-        return $this;
-    }
 }

@@ -2,21 +2,42 @@
 
 namespace App\Entity;
 
-use App\Repository\QuartiersRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\QuartiersRepository;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: QuartiersRepository::class)]
+#[ApiResource(
+    collectionOperations:[
+        "get",
+        "post" =>[
+            "access_control" => "is_granted('ROLE_GESTIONNAIRE')",
+            "security_message"=>"Vous n'avez pas access à cette Ressource",
+            'denormalization_context' => ['groups' => ['write']],
+            'normalization_context' => ['groups' => ['quartier:read:all']]
+        ]
+    ],
+    itemOperations:[
+        "get",
+        "put",
+        "patch"
+    ]
+)]
 class Quartiers
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(["write","zone:read:all"])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(["write","zone:read:all"])]
     private $libelle;
 
     #[ORM\ManyToOne(targetEntity: Zone::class, inversedBy: 'quartiers')]
+    #[Groups(["write","zone:read:all"])]
     private $zone;
 
     public function getId(): ?int

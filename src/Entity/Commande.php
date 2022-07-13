@@ -2,31 +2,53 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CommandeRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use DateTime;
+use Symfony\Component\HttpFoundation\Response;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\Date;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations:[
+        "get",
+        "post" => [
+        "method"=>"post",
+        'denormalization_context' => ['groups' => ['commande']],
+        'normalization_context' => ['groups' => ['comande:read']]
+        ]
+    ],
+        itemOperations:[
+            "get","path"
+        ]
+)]
 class Commande
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups('commande','comande:read')]
     private $id;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups('commande','comande:read')]
     private $numero;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups('comande:read')]
     private $date;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $etat;
+    #[Groups('comande:read')]
+    private $etat='En_cours';
 
     #[ORM\Column(type: 'integer')]
+    #[Groups('commande','comande:read')]
     private $montant;
 
     #[ORM\ManyToOne(targetEntity: Livraison::class, inversedBy: 'commandes')]
@@ -36,21 +58,28 @@ class Commande
     private $zone;
 
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'commandes')]
+    #[ApiSubresource()]
+    #[Groups('commande')]
     private $client;
 
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'commandes')]
+    #[Groups('commande')]
     private $gestionnaire;
 
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: BurgerCommande::class)]
+    #[Groups('commande')]
     private $burgerCommandes;
 
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: PortionCommande::class)]
+    #[Groups('commande')]
     private $portionCommandes;
 
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: MenuCommande::class)]
+    #[Groups('commande')]
     private $menuCommandes;
 
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: BoissonCommande::class)]
+    #[Groups('commande')]
     private $boissonCommandes;
 
     public function __construct()
@@ -59,6 +88,8 @@ class Commande
         $this->portionCommandes = new ArrayCollection();
         $this->menuCommandes = new ArrayCollection();
         $this->boissonCommandes = new ArrayCollection();
+        $this->date = new \DateTime();
+
     }
     public function getId(): ?int
     {
@@ -77,7 +108,7 @@ class Commande
         return $this;
     }
 
-    public function getDate(): ?string
+    public function getDate(): ?DateTime
     {
         return $this->date;
     }

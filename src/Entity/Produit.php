@@ -36,6 +36,7 @@ class Produit
     protected $nom;
 
     #[ORM\Column(type: 'blob')]
+    #[Groups(["burger:read:simple", "burger:read:all", "boisson:read:all", "portion:read:all","complements", "catologue"])]
     protected $image;
 
     #[Groups(["burger:read:simple", "burger:read:all", "boisson:read:all", "portion:read:all","write", "complements", "catologue"])]

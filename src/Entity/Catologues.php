@@ -35,5 +35,6 @@ class Catologues
         $this->burgers = new ArrayCollection();
         $this->menus = new ArrayCollection();
     }
+    
 
 }

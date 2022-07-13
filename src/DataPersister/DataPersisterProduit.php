@@ -52,7 +52,6 @@ class DataPersisterProduit implements DataPersisterInterface
  
         if($data instanceof Menu){
             $prix=$this->pricemenu->PriceMenu($data);
-            
             $data->setPrix($prix);
         }
 

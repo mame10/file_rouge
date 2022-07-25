@@ -7,10 +7,30 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\HttpFoundation\Response;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations:[
+        "post",
+        "post_register" => [
+        "method"=>"post",
+        'status' => Response::HTTP_CREATED,
+        'path'=>'register/',
+        // 'denormalization_context' => ['groups' => ['user:write']],
+        'normalization_context' => ['groups' => ['user:read:simple']]
+        ],
+        "get" => [
+            "method" =>"get",
+            'status'=>Response::HTTP_CREATED,
+            'normalization_context' => ['groups' => ['user:read:all']]
+        ]
+    ],
+    itemOperations:["put","get","delete"]
+)]
+
 class Client extends User
 {
    
@@ -22,11 +42,13 @@ class Client extends User
     private $telephone;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Commande::class)]
+    // #[ApiSubresource]
     private $commandes;
 
     public function __construct()
     {
         $this->commandes = new ArrayCollection();
+        $this->setRoles(['ROLE_CLIENT']);
     }
 
 

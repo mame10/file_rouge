@@ -41,14 +41,13 @@ class Commande
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'commandes')]
     private $gestionnaire;
 
-    #[ORM\ManyToMany(targetEntity: Produit::class, inversedBy: 'commandes')]
-    private $produits;
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: ProduitCommande::class)]
+    private $produitCommandes;
 
     public function __construct()
     {
-        $this->produits = new ArrayCollection();
+        $this->produitCommandes = new ArrayCollection();
     }
-
     public function getId(): ?int
     {
         return $this->id;
@@ -151,26 +150,33 @@ class Commande
     }
 
     /**
-     * @return Collection<int, Produit>
+     * @return Collection<int, ProduitCommande>
      */
-    public function getProduits(): Collection
+    public function getProduitCommandes(): Collection
     {
-        return $this->produits;
+        return $this->produitCommandes;
     }
 
-    public function addProduit(Produit $produit): self
+    public function addProduitCommande(ProduitCommande $produitCommande): self
     {
-        if (!$this->produits->contains($produit)) {
-            $this->produits[] = $produit;
+        if (!$this->produitCommandes->contains($produitCommande)) {
+            $this->produitCommandes[] = $produitCommande;
+            $produitCommande->setCommande($this);
         }
 
         return $this;
     }
 
-    public function removeProduit(Produit $produit): self
+    public function removeProduitCommande(ProduitCommande $produitCommande): self
     {
-        $this->produits->removeElement($produit);
+        if ($this->produitCommandes->removeElement($produitCommande)) {
+            // set the owning side to null (unless already changed)
+            if ($produitCommande->getCommande() === $this) {
+                $produitCommande->setCommande(null);
+            }
+        }
 
         return $this;
     }
+ 
 }

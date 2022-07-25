@@ -3,66 +3,44 @@
 namespace App\Entity;
 
 use App\Entity\Produit;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PortionFriteRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\HttpFoundation\Response;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: PortionFriteRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations:[
+        "get"=>[
+            'method' => 'get',
+            'status' => Response::HTTP_OK,
+            'normalization_context' => ['groups' => ['portion:read:simple']]
+        ],
+        
+        "post"=>[
+            "access_control" => "is_granted('ROLE_GESTIONNAIRE')",
+            "security_message"=>"Vous n'avez pas access à cette Ressource",
+            'denormalization_context' => ['groups' => ['write']],
+            'normalization_context' => ['groups' => ['portion:read:all']]
+        ]
+    ],
+    itemOperations:[
+        "put"
+        ,"get"
+    ]
+)]
 class PortionFrite extends Produit
 {
-    #[ORM\ManyToOne(targetEntity: Complements::class, inversedBy: 'portions')]
-    private $complements;
 
-    #[ORM\ManyToMany(targetEntity: Menu::class, mappedBy: 'portionsFrites')]
-    private $menus;
 
     public function __construct()
     {
-        parent::__construct();
-        $this->menus = new ArrayCollection();
+      
         
     }
 
-    public function getComplements(): ?Complements
-    {
-        return $this->complements;
-    }
-
-    public function setComplements(?Complements $complements): self
-    {
-        $this->complements = $complements;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Menu>
-     */
-    public function getMenus(): Collection
-    {
-        return $this->menus;
-    }
-
-    public function addMenu(Menu $menu): self
-    {
-        if (!$this->menus->contains($menu)) {
-            $this->menus[] = $menu;
-            $menu->addPortionsFrite($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMenu(Menu $menu): self
-    {
-        if ($this->menus->removeElement($menu)) {
-            $menu->removePortionsFrite($this);
-        }
-
-        return $this;
-    }
+ 
 
 }

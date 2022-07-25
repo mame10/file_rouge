@@ -7,10 +7,27 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\GestionnaireRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: GestionnaireRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations:[
+        "post" => [
+        "method"=>"post",
+        'status' => Response::HTTP_CREATED,
+        'denormalization_context' => ['groups' => ['write']],
+        'normalization_context' => ['groups' => ['user:read:simple']]
+        ],
+        "get" => [
+            "method" =>"get",
+            'status'=>Response::HTTP_CREATED,
+            'normalization_context' => ['groups' => ['user:read:all']]
+        ]
+    ],
+    itemOperations:["put","get","delete"]
+)]
+
 class Gestionnaire extends User
 {
     #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Commande::class)]
@@ -19,6 +36,8 @@ class Gestionnaire extends User
     public function __construct()
     {
         $this->commandes = new ArrayCollection();
+        $this->burgers = new ArrayCollection();
+        $this->setRoles(['ROLE_GESTIONNAIRE']);
     }
 
     /**
@@ -47,7 +66,6 @@ class Gestionnaire extends User
                 $commande->setGestionnaire(null);
             }
         }
-
         return $this;
     }
 }

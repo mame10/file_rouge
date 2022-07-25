@@ -10,7 +10,16 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: LivreurRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations:[
+        "get",
+        "post"
+    ],
+    itemOperations:[
+        "get",
+        "put"
+    ]
+)]
 class Livreur extends User
 {
 
@@ -32,7 +41,6 @@ class Livreur extends User
     }
 
    
-
     public function getMatriculeMoto(): ?string
     {
         return $this->matriculeMoto;

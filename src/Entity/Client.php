@@ -8,18 +8,18 @@ use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\HttpFoundation\Response;
-use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 #[ApiResource(
+
     collectionOperations:[
-        "post",
         "post_register" => [
         "method"=>"post",
         'status' => Response::HTTP_CREATED,
-        'path'=>'register/',
-        // 'denormalization_context' => ['groups' => ['user:write']],
+        'path'=>'client/register',
+        'denormalization_context' => ['groups' => ['user:write']],
         'normalization_context' => ['groups' => ['user:read:simple']]
         ],
         "get" => [
@@ -29,26 +29,30 @@ use Doctrine\Common\Collections\ArrayCollection;
         ]
     ],
     itemOperations:["put","get","delete"]
+
 )]
 
 class Client extends User
 {
-   
-
+    #[Groups("user:write")]
     #[ORM\Column(type: 'string', length: 255)]
     private $adresse;
 
+    #[Groups("user:write")]
     #[ORM\Column(type: 'string', length: 255)]
     private $telephone;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Commande::class)]
-    // #[ApiSubresource]
-    private $commandes;
+    private Collection $commande;
+
+    // #[ORM\OneToMany(mappedBy: 'client', targetEntity: Commande::class)]
+    // // #[ApiSubresource]
+    // private $commandes;
 
     public function __construct()
     {
-        $this->commandes = new ArrayCollection();
         $this->setRoles(['ROLE_CLIENT']);
+        $this->commande = new ArrayCollection();
     }
 
 
@@ -72,22 +76,21 @@ class Client extends User
     public function setTelephone(string $telephone): self
     {
         $this->telephone = $telephone;
-
         return $this;
     }
 
     /**
      * @return Collection<int, Commande>
      */
-    public function getCommandes(): Collection
+    public function getCommande(): Collection
     {
-        return $this->commandes;
+        return $this->commande;
     }
 
     public function addCommande(Commande $commande): self
     {
-        if (!$this->commandes->contains($commande)) {
-            $this->commandes[] = $commande;
+        if (!$this->commande->contains($commande)) {
+            $this->commande->add($commande);
             $commande->setClient($this);
         }
 
@@ -96,7 +99,7 @@ class Client extends User
 
     public function removeCommande(Commande $commande): self
     {
-        if ($this->commandes->removeElement($commande)) {
+        if ($this->commande->removeElement($commande)) {
             // set the owning side to null (unless already changed)
             if ($commande->getClient() === $this) {
                 $commande->setClient(null);
@@ -105,4 +108,6 @@ class Client extends User
 
         return $this;
     }
+
+   
 }

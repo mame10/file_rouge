@@ -1,24 +1,34 @@
 <?php
+
 namespace App\DataPersister;
 
 use App\Entity\Menu;
 use App\Entity\Produit;
 use App\Services\CalculPriceMenu;
+use App\Services\CalculPriceMenuService;
 use Doctrine\ORM\EntityManagerInterface;
-use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use App\Services\ICalculPriceMenuService;
+// use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\Security;
+use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 
 class DataPersisterProduit implements DataPersisterInterface
 {
     private $entityManager;
-    private $pricemenu;
     private $security;
 
-    public function __construct(Security $security, CalculPriceMenu $pricemenu, EntityManagerInterface $entityManager) 
+    private ICalculPriceMenuService $pricemenu;
+    // private $security;
+    private TokenStorageInterface $tokenStorage;
+
+    public function __construct(TokenStorageInterface $tokenStorage, Security $security, ICalculPriceMenuService $pricemenu, EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
         $this->pricemenu = $pricemenu;
-        $this->security = $security;   
+        $this->security = $security;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -26,20 +36,27 @@ class DataPersisterProduit implements DataPersisterInterface
      */
     public function supports($data, array $context = []): bool
     {
-        return $data instanceof Produit ;
+        return $data instanceof Produit;
     }
 
-    /**
-     * @param User $data
+   /**
+     * @param Produit $data
      */
     public function persist($data, array $context = [])
     {
-        if( $data instanceof Produit){
-        $data->setUser($this->security->getUser()) ;
+
+        if ($data instanceof Produit) {
+            if ($data->getImageFile()) {
+                $data->setImage(file_get_contents($data->getImageFile()));
+            }
+        }
+        if ($data instanceof Produit) {
+            $data->setUser($this->tokenStorage->getToken()->getUser());
         }
 
-        if($data instanceof Menu){
-            $this->pricemenu->PriceMenu($data);
+        if ($data instanceof Menu) {
+            $prix = $this->pricemenu->PriceMenu($data);
+            $data->setPrix($prix);
         }
 
         $this->entityManager->persist($data);
@@ -54,5 +71,4 @@ class DataPersisterProduit implements DataPersisterInterface
         $this->entityManager->remove($data);
         $this->entityManager->flush();
     }
-
 }

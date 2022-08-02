@@ -11,11 +11,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: LivreurRepository::class)]
 #[ApiResource(
-    collectionOperations:[
+    collectionOperations: [
         "get",
         "post"
     ],
-    itemOperations:[
+    itemOperations: [
         "get",
         "put"
     ]
@@ -32,15 +32,15 @@ class Livreur extends User
     #[ORM\Column(type: 'string', length: 255)]
     private $etat;
 
-    #[ORM\OneToMany(mappedBy: 'livreur', targetEntity: Livraison::class)]
-    private $livraisons;
+    // #[ORM\OneToMany(mappedBy: 'livreur', targetEntity: Livraison::class)]
+    // private $livraisons;
 
     public function __construct()
     {
-        $this->livraisons = new ArrayCollection();
+        // $this->livraisons = new ArrayCollection();
     }
 
-   
+
     public function getMatriculeMoto(): ?string
     {
         return $this->matriculeMoto;
@@ -77,33 +77,7 @@ class Livreur extends User
         return $this;
     }
 
-    /**
-     * @return Collection<int, Livraison>
-     */
-    public function getLivraisons(): Collection
-    {
-        return $this->livraisons;
-    }
+   
 
-    public function addLivraison(Livraison $livraison): self
-    {
-        if (!$this->livraisons->contains($livraison)) {
-            $this->livraisons[] = $livraison;
-            $livraison->setLivreur($this);
-        }
-
-        return $this;
-    }
-
-    public function removeLivraison(Livraison $livraison): self
-    {
-        if ($this->livraisons->removeElement($livraison)) {
-            // set the owning side to null (unless already changed)
-            if ($livraison->getLivreur() === $this) {
-                $livraison->setLivreur(null);
-            }
-        }
-
-        return $this;
-    }
+  
 }

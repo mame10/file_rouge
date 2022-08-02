@@ -18,14 +18,20 @@ class ProduitCommande
     #[ORM\Column(type: 'integer')]
     private $quantiteProduit;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'produitCommende')]
-    private $user;
+    #[ORM\ManyToOne(targetEntity: Commande::class,inversedBy: 'produitCommandes')]
+    private $commande ;
 
-    #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'produitCommandes')]
-    private $commande;
+    #[ORM\ManyToOne(targetEntity: Produit::class,inversedBy: 'produitCommandes')]
+    private $produit;
 
-    #[ORM\ManyToOne(targetEntity: Produit::class, inversedBy: 'produitCommande')]
-    private $produit; 
+    // #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'produitCommende')]
+    // private $user;
+
+    // #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'produitCommandes')]
+    // private $commande;
+
+    // #[ORM\ManyToOne(targetEntity: Produit::class, inversedBy: 'produitCommande')]
+    // private $produit;
 
     public function getId(): ?int
     {
@@ -40,18 +46,6 @@ class ProduitCommande
     public function setQuantiteProduit(int $quantiteProduit): self
     {
         $this->quantiteProduit = $quantiteProduit;
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-
         return $this;
     }
 
@@ -78,4 +72,8 @@ class ProduitCommande
 
         return $this;
     }
+
+    
+
+   
 }

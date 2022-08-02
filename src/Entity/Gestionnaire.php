@@ -14,10 +14,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 #[ApiResource(
     collectionOperations:[
         "post" => [
-        "method"=>"post",
-        'status' => Response::HTTP_CREATED,
-        'denormalization_context' => ['groups' => ['write']],
-        'normalization_context' => ['groups' => ['user:read:simple']]
+            "method"=>"post",
+            'status' => Response::HTTP_CREATED,
+            'denormalization_context' => ['groups' => ['write']],
+            'normalization_context' => ['groups' => ['user:read:simple']]
         ],
         "get" => [
             "method" =>"get",
@@ -31,13 +31,23 @@ use Doctrine\Common\Collections\ArrayCollection;
 class Gestionnaire extends User
 {
     #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Commande::class)]
-    private $commandes;
+    private Collection $commandes;
+
+    #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Produit::class)]
+    private Collection $produits;
+
+    // #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Commande::class)]
+    // private $commandes;
+
+    // #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Produit::class)]
+    // private $produits;
 
     public function __construct()
     {
         $this->commandes = new ArrayCollection();
-        $this->burgers = new ArrayCollection();
         $this->setRoles(['ROLE_GESTIONNAIRE']);
+        $this->produits = new ArrayCollection();
+      
     }
 
     /**
@@ -51,7 +61,7 @@ class Gestionnaire extends User
     public function addCommande(Commande $commande): self
     {
         if (!$this->commandes->contains($commande)) {
-            $this->commandes[] = $commande;
+            $this->commandes->add($commande);
             $commande->setGestionnaire($this);
         }
 
@@ -66,6 +76,38 @@ class Gestionnaire extends User
                 $commande->setGestionnaire(null);
             }
         }
+
         return $this;
     }
+
+    /**
+     * @return Collection<int, Produit>
+     */
+    public function getProduits(): Collection
+    {
+        return $this->produits;
+    }
+
+    public function addProduit(Produit $produit): self
+    {
+        if (!$this->produits->contains($produit)) {
+            $this->produits->add($produit);
+            $produit->setGestionnaire($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduit(Produit $produit): self
+    {
+        if ($this->produits->removeElement($produit)) {
+            // set the owning side to null (unless already changed)
+            if ($produit->getGestionnaire() === $this) {
+                $produit->setGestionnaire(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

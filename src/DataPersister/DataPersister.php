@@ -14,16 +14,19 @@ class DataPersister implements DataPersisterInterface
     private $entityManager;
     private $passwordEncoder;
 
-    private TokenStorageInterface $tokenStorage ;
+    private TokenStorageInterface $tokenStorage;
 
-    
-    public function __construct(EntityManagerInterface $entityManager,UserPasswordHasherInterface $passwordEncoder,MailerService $mailerService
-     ,TokenStorageInterface $tokenStorage) {
+
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        UserPasswordHasherInterface $passwordEncoder,
+        MailerService $mailerService,
+        TokenStorageInterface $tokenStorage
+    ) {
         $this->entityManager = $entityManager;
         $this->passwordEncoder = $passwordEncoder;
         $this->mailerService = $mailerService;
         $this->tokenStorage = $tokenStorage;
-    
     }
 
     /**
@@ -40,14 +43,14 @@ class DataPersister implements DataPersisterInterface
      */
     public function persist($data, array $context = [])
     {
-        if( $data instanceof User){
+        if ($data instanceof User) {
             if ($data->getPlainPassword()) {
-                $password=$this->passwordEncoder->hashPassword($data, $data->getPlainPassword());
+                $password = $this->passwordEncoder->hashPassword($data, $data->getPlainPassword());
                 $data->setPassword($password);
                 $data->eraseCredentials();
                 $data->setToken($this->generateToken());
             }
-            $this->mailerService->SendEmail($data,$data->getToken()); 
+            $this->mailerService->SendEmail($data, $data->getToken());
         }
         $this->entityManager->persist($data);
         $this->entityManager->flush();

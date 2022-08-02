@@ -20,8 +20,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
             'normalization_context' => ['groups' => ['burger:read:simple']],
         ],
         "post" =>[
-            "access_control" => "is_granted('ROLE_GESTIONNAIRE')",
-            "security_message"=>"Vous n'avez pas access à cette Ressource",
+            // "access_control" => "is_granted('ROLE_GESTIONNAIRE')",
+            // "security_message"=>"Vous n'avez pas access à cette Ressource",
             'denormalization_context' => ['groups' => ['write']],
             'normalization_context' => ['groups' => ['burger:read:all']]
         ]
@@ -44,46 +44,80 @@ use Symfony\Component\Serializer\Annotation\Groups;
 ) ]
 class Burger extends Produit
 {
-    #[ORM\OneToMany(mappedBy: 'burger', targetEntity: BurgerMenu::class)]
-    private $burgerMenus;
+   
+#[ORM\OneToMany(mappedBy: 'burger', targetEntity: BurgerCommande::class)]
+    private Collection $burgerCommande;
+
+#[ORM\OneToMany(mappedBy: 'burger', targetEntity: MenuBurger::class)]
+private Collection $menuBurger;
+
+    //    #[ORM\OneToMany(mappedBy: 'burger', targetEntity: BurgerCommande::class,cascade:['persist'])]
+//    private $burgerCommandes;
 
     public function __construct()
     {
-        parent::__construct();
-        $this->burgerMenus = new ArrayCollection();
-       
+        $this->burgerCommande = new ArrayCollection();
+        $this->menuBurger = new ArrayCollection();  
     }
 
     /**
-     * @return Collection<int, BurgerMenu>
+     * @return Collection<int, BurgerCommande>
      */
-    public function getBurgerMenus(): Collection
+    public function getBurgerCommande(): Collection
     {
-        return $this->burgerMenus;
+        return $this->burgerCommande;
     }
 
-    public function addBurgerMenu(BurgerMenu $burgerMenu): self
+    public function addBurgerCommande(BurgerCommande $burgerCommande): self
     {
-        if (!$this->burgerMenus->contains($burgerMenu)) {
-            $this->burgerMenus[] = $burgerMenu;
-            $burgerMenu->setBurger($this);
+        if (!$this->burgerCommande->contains($burgerCommande)) {
+            $this->burgerCommande->add($burgerCommande);
+            $burgerCommande->setBurger($this);
+        }
+        return $this;
+    }
+
+    public function removeBurgerCommande(BurgerCommande $burgerCommande): self
+    {
+        if ($this->burgerCommande->removeElement($burgerCommande)) {
+            // set the owning side to null (unless already changed)
+            if ($burgerCommande->getBurger() === $this) {
+                $burgerCommande->setBurger(null);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MenuBurger>
+     */
+    public function getMenuBurger(): Collection
+    {
+        return $this->menuBurger;
+    }
+
+    public function addMenuBurger(MenuBurger $menuBurger): self
+    {
+        if (!$this->menuBurger->contains($menuBurger)) {
+            $this->menuBurger->add($menuBurger);
+            $menuBurger->setBurger($this);
         }
 
         return $this;
     }
 
-    public function removeBurgerMenu(BurgerMenu $burgerMenu): self
+    public function removeMenuBurger(MenuBurger $menuBurger): self
     {
-        if ($this->burgerMenus->removeElement($burgerMenu)) {
+        if ($this->menuBurger->removeElement($menuBurger)) {
             // set the owning side to null (unless already changed)
-            if ($burgerMenu->getBurger() === $this) {
-                $burgerMenu->setBurger(null);
+            if ($menuBurger->getBurger() === $this) {
+                $menuBurger->setBurger(null);
             }
         }
 
         return $this;
     }
 
-    
    
+
 }

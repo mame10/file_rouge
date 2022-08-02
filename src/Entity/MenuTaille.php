@@ -2,25 +2,42 @@
 
 namespace App\Entity;
 
-use App\Repository\MenuTailleRepository;
+
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\MenuTailleRepository;
+
+use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MenuTailleRepository::class)]
+#[ApiResource()]
+
 class MenuTaille
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(["menu:write"])]
     private $id;
+    
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(["menu:write"])]
     private $quantiteBoisson;
 
-    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menutailles')]
-    private $menu;
+    // #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menutailles')]
+    // private $menu;
 
-    #[ORM\ManyToOne(targetEntity: Taille::class, inversedBy: 'tailleMenus')]
-    private $taille;
+    // #[ORM\ManyToOne(targetEntity: Taille::class, inversedBy: 'tailleMenus')]
+    // #[Groups(["menu:write"])]
+    // private $taille;
+
+    #[ORM\ManyToOne(inversedBy: 'menuTailles')]
+    private ?Menu $menus = null;
+
+    #[ORM\ManyToOne(inversedBy: 'menuTailles')]
+    #[Groups(["menu:write"])]
+    private ?Taille $tailles = null;
 
     public function getId(): ?int
     {
@@ -39,27 +56,29 @@ class MenuTaille
         return $this;
     }
 
-    public function getMenu(): ?Menu
+    public function getMenus(): ?Menu
     {
-        return $this->menu;
+        return $this->menus;
     }
 
-    public function setMenu(?Menu $menu): self
+    public function setMenus(?Menu $menus): self
     {
-        $this->menu = $menu;
+        $this->menus = $menus;
 
         return $this;
     }
 
-    public function getTaille(): ?Taille
+    public function getTailles(): ?Taille
     {
-        return $this->taille;
+        return $this->tailles;
     }
 
-    public function setTaille(?Taille $taille): self
+    public function setTailles(?Taille $tailles): self
     {
-        $this->taille = $taille;
+        $this->tailles = $tailles;
 
         return $this;
     }
+
+    
 }

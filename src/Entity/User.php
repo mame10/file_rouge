@@ -19,19 +19,19 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\InheritanceType("JOINED")]
 #[ORM\DiscriminatorColumn(name: "discr", type: "string")]
-#[ORM\DiscriminatorMap(["user" => "User", "client" => "Client","livreur" => "Livreur","gestionnaire" => "Gestionnaire"])]
+#[ORM\DiscriminatorMap(["user" => "User", "client" => "Client", "livreur" => "Livreur", "gestionnaire" => "Gestionnaire"])]
 
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
-    collectionOperations:[
+    collectionOperations: [
         "get" => [
-            "method" =>"get",
-            'status'=>Response::HTTP_CREATED,
+            "method" => "get",
+            'status' => Response::HTTP_CREATED,
             'normalization_context' => ['groups' => ['user:read:all']]
         ]
     ],
-    itemOperations:["put","get"]
+    itemOperations: ["put", "get"]
 )]
 
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -39,42 +39,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["burger:read:all","user:read:simple","write"])]
+    #[Groups(["burger:read:all", "user:read:simple", "write"])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    #[Groups(["burger:read:all","user:read:simple","user:read:all","write"])]
+    #[Groups(["burger:read:all", "user:read:simple", "user:read:all", "write"])]
     protected $login;
 
     #[ORM\Column(type: 'json')]
-    #[Groups(["user:read:simple","user:read:all"])]
+    #[Groups(["user:read:all"])]
     protected $roles = [];
 
     #[ORM\Column(type: 'string')]
+    #[Groups(["user:read:simple"])]
     protected $password;
 
-    #[ORM\Column(type: 'string', length: 255,nullable:true)]
-    #[Groups(["user:read:simple","user:read:all","write"])]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(["user:read:simple", "user:read:all", "write"])]
     protected $nom;
 
-    #[ORM\Column(type: 'string', length: 255,nullable:true)]
-    #[Groups(["user:read:simple","user:read:all","write"])]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(["user:read:simple", "user:read:all", "write"])]
     protected $prenom;
 
-    #[ORM\Column(type: 'string', length: 255,nullable:true)]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(["user:read:all", "write"])]
     protected $token;
 
     #[SerializedName("password")]
-    #[Groups(["write"])]
+    #[Groups(["write",'user:write'])]
     protected $plainPassword;
 
-    #[ORM\Column(type: 'datetime',nullable:true)]
-    #[Groups(["write"])]
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(["write",'user:read:all'])]
     protected $expireAt;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Produit::class)]
+    private Collection $produits;
+
 
     public function __construct()
     {
-      
+        // $this->produits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -109,9 +115,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_VISITEUR';
-
         return array_unique($roles);
     }
 
@@ -207,5 +211,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    
+    /**
+     * @return Collection<int, Produit>
+     */
+    public function getProduits(): Collection
+    {
+        return $this->produits;
+    }
+
+    public function addProduit(Produit $produit): self
+    {
+        if (!$this->produits->contains($produit)) {
+            $this->produits->add($produit);
+            $produit->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduit(Produit $produit): self
+    {
+        if ($this->produits->removeElement($produit)) {
+            // set the owning side to null (unless already changed)
+            if ($produit->getUser() === $this) {
+                $produit->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

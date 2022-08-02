@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\BurherMenu;
+use App\Entity\BoissonCommande;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<BurherMenu>
+ * @extends ServiceEntityRepository<BoissonCommande>
  *
- * @method BurherMenu|null find($id, $lockMode = null, $lockVersion = null)
- * @method BurherMenu|null findOneBy(array $criteria, array $orderBy = null)
- * @method BurherMenu[]    findAll()
- * @method BurherMenu[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method BoissonCommande|null find($id, $lockMode = null, $lockVersion = null)
+ * @method BoissonCommande|null findOneBy(array $criteria, array $orderBy = null)
+ * @method BoissonCommande[]    findAll()
+ * @method BoissonCommande[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class BurherMenuRepository extends ServiceEntityRepository
+class BoissonCommandeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, BurherMenu::class);
+        parent::__construct($registry, BoissonCommande::class);
     }
 
-    public function add(BurherMenu $entity, bool $flush = false): void
+    public function add(BoissonCommande $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class BurherMenuRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(BurherMenu $entity, bool $flush = false): void
+    public function remove(BoissonCommande $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class BurherMenuRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return BurherMenu[] Returns an array of BurherMenu objects
+//     * @return BoissonCommande[] Returns an array of BoissonCommande objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class BurherMenuRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?BurherMenu
+//    public function findOneBySomeField($value): ?BoissonCommande
 //    {
 //        return $this->createQueryBuilder('b')
 //            ->andWhere('b.exampleField = :val')

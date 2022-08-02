@@ -6,11 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ProduitRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Component\HttpFoundation\Response;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+// use Symfony\Component\Validator\Constraints as Assert;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\SerializedName;
+
 
 #[ORM\InheritanceType("JOINED")]
 #[ORM\DiscriminatorColumn(name: "discr", type: "string")]
@@ -21,42 +22,51 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
-
 class Produit
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["burger:read:simple", "burger:read:all", "user:read:simple", "boisson:read:all", "portion:read:all", "menu:read:all", "write", "menu:read:simple"])]
+    #[Groups(['details:read:all',"burger:read:simple", "burger:read:all", "user:read:simple", "boisson:read:all", "portion:read:all", "menu:read:all", "write", "menu:read:simple", 'menu:write'])]
     protected $id;
 
-    #[Groups(["burger:read:simple", "burger:read:all", "boisson:read:all", "portion:read:all", "menu:read:all", "write", "complements", "menu:read:simple", "catologue"])]
+    #[Groups(['details:read:all',"burger:read:simple", "burger:read:all", "boisson:read:all", "portion:read:all", "write", "complements", "catologue", "menu:write", 'menu:read:all'])]
     #[ORM\Column(type: 'string', length: 255)]
-    #[Assert\NotBlank(message: "Le nom est Obligatoire")]
-    private $nom;
+    // #[Assert\Unique(message: "Le nom est du produit est unique")]
+    protected $nom;
 
-    #[ORM\Column(type: 'object')]
-    private $image;
+    #[ORM\Column(type: 'blob')]
+    #[Groups(['details:read:all','menu:read:all', "burger:read:simple", "burger:read:all", "boisson:read:all", "portion:read:all", "complements", "catologue"])]
+    protected $image;
 
-    #[Groups(["burger:read:simple", "burger:read:all", "boisson:read:all", "portion:read:all", "menu:read:all", "write", "complements", "menu:read:simple", "catologue"])]
+    #[Groups(['details:read:all','details:read:all', 'menu:read:all', "burger:read:simple", "burger:read:all", "boisson:read:all", "portion:read:all", "write", "complements", "catologue", "menu:write"])]
     #[ORM\Column(type: 'integer', nullable: true)]
-    // #[Assert\NotBlank(message: "Le prix est Obligatoire")]
-    private $prix;
+    // #[Assert\NotNull(message: "Le prix ne doit etre nul!!")]
+    protected $prix;
 
     #[ORM\Column(type: 'boolean')]
-    #[Groups(["burger:read:all", "boisson:read:all", "menu:read:all", "complements", "catologue"])]
-    private $isEtat = true;
+    #[Groups(['details:read:all','menu:read:all', "burger:read:all", "boisson:read:all", "complements", "catologue", "menu:read:all"])]
+    protected $isEtat = true;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'produits')]
-    #[Groups(["burger:read:all", "boisson:read:all", "write"])]
-    #[ApiSubresource]
-    private $user;
+    // #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'produits')]
+    // private $gestionnaire;
+
+    #[SerializedName('images')]
+    #[Groups(["burger:read:simple", "menu:write", "burger:read:all", "boisson:read:all", "boisson:read:simple", "portion:read:all", "portion:read:simple", "write"])]
+    private string $imageFile;
+
+    #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'produits')]
+    private $gestionnaire;
 
     #[ORM\OneToMany(mappedBy: 'produit', targetEntity: ProduitCommande::class)]
-    private $produitCommande;
+    private Collection $produitCommandes;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'produits')]
+    private $user;
+
     public function __construct()
     {
-        $this->produitCommande = new ArrayCollection();
+        $this->produitCommandes = new ArrayCollection();
     }
     public function getId(): ?int
     {
@@ -71,25 +81,23 @@ class Produit
     public function setNom(string $nom): self
     {
         $this->nom = $nom;
-
         return $this;
     }
 
     public function getImage()
     {
-        if ($this->image) {
-            return (base64_encode(stream_get_contents($this->image)));
+        if (is_resource($this->image)) {
+            return base64_encode(stream_get_contents($this->image));
         }
-        // return $this->image;
+        return base64_encode($this->image);
     }
 
-    public function setImage(object $image): self
+    public function setImage($image): self
     {
         $this->image = $image;
 
         return $this;
     }
-
 
     public function getPrix(): ?int
     {
@@ -99,7 +107,6 @@ class Produit
     public function setPrix(?int $prix): self
     {
         $this->prix = $prix;
-
         return $this;
     }
 
@@ -111,6 +118,58 @@ class Produit
     public function setIsEtat(bool $isEtat): self
     {
         $this->isEtat = $isEtat;
+        return $this;
+    }
+
+    public function getImageFile(): ?string
+    {
+        return $this->imageFile;
+    }
+
+    public function setImageFile(string $imageFile): self
+    {
+        $this->imageFile = $imageFile;
+        return $this;
+    }
+
+    public function getGestionnaire(): ?Gestionnaire
+    {
+        return $this->gestionnaire;
+    }
+
+    public function setGestionnaire(?Gestionnaire $gestionnaire): self
+    {
+        $this->gestionnaire = $gestionnaire;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProduitCommande>
+     */
+    public function getProduitCommandes(): Collection
+    {
+        return $this->produitCommandes;
+    }
+
+    public function addProduitCommande(ProduitCommande $produitCommande): self
+    {
+        if (!$this->produitCommandes->contains($produitCommande)) {
+            $this->produitCommandes->add($produitCommande);
+            $produitCommande->setProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduitCommande(ProduitCommande $produitCommande): self
+    {
+        if ($this->produitCommandes->removeElement($produitCommande)) {
+            // set the owning side to null (unless already changed)
+            if ($produitCommande->getProduit() === $this) {
+                $produitCommande->setProduit(null);
+            }
+        }
 
         return $this;
     }
@@ -123,37 +182,7 @@ class Produit
     public function setUser(?User $user): self
     {
         $this->user = $user;
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ProduitCommande>
-     */
-    public function getProduitCommande(): Collection
-    {
-        return $this->produitCommande;
-    }
-
-    public function addProduitCommande(ProduitCommande $produitCommande): self
-    {
-        if (!$this->produitCommande->contains($produitCommande)) {
-            $this->produitCommande[] = $produitCommande;
-            $produitCommande->setProduit($this);
-        }
 
         return $this;
     }
-
-    public function removeProduitCommande(ProduitCommande $produitCommande): self
-    {
-        if ($this->produitCommande->removeElement($produitCommande)) {
-            // set the owning side to null (unless already changed)
-            if ($produitCommande->getProduit() === $this) {
-                $produitCommande->setProduit(null);
-            }
-        }
-
-        return $this;
-    }
-
 }

@@ -15,26 +15,22 @@ class MenuBurger
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['details:read:all'])]
     private $id;
 
     #[ORM\Column(type: 'float')]
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write",'details:read:all'])]
     #[Assert\Positive(message: "la quantité doit etre superieure à zero")]
     #[Assert\NotNull()]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: Burger::class,inversedBy: 'menuBurger')]
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write",'details:read:all'])]
     private $burger;
 
     #[ORM\ManyToOne(inversedBy: 'menuBurgers')]
     private ?Menu $menus = null;
-    // #[ORM\ManyToOne(targetEntity: Burger::class, inversedBy: 'menuBurgers')]
-    // #[Groups(["menu:write"])]
-    // private $burger;
 
-    // #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuBurgers')]
-    // private $menu;
 
     public function getId(): ?int
     {

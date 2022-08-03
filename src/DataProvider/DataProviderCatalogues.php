@@ -24,8 +24,8 @@ class DataProviderCatalogues implements ContextAwareCollectionDataProviderInterf
     {
         if(Catologues::class === $resourceClass){
             return [
-                ["menu"=>$this->menu->findAll()],
-                ["burger"=>$this->burger->findAll()]
+                ["menu"=>$this->menu->findBy(['isEtat'=>true])],
+                ["burger"=>$this->burger->findBy(['isEtat'=>true])]
             ];
         } 
     }

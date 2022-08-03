@@ -67,19 +67,20 @@ class Menu extends Produit
          min: 1,
         minMessage: "le menu doit avoir au moins un burger"
     )]
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write",'details:read:all'])]
     private Collection $menuBurgers;
 
     #[ORM\OneToMany(mappedBy: 'menus', targetEntity: MenuCommande::class,cascade:['persist'])]
     private Collection $menuCommandes;
 
     #[ORM\OneToMany(mappedBy: 'menus', targetEntity: MenuPortion::class,cascade:['persist'])]
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write",'details:read:all'])]
     // #[SerializedName("portion")]
+    
     private Collection $menuPortions;
 
     #[ORM\OneToMany(mappedBy: 'menus', targetEntity: MenuTaille::class,cascade:['persist'])]
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write",'details:read:all'])]
     // #[SerializedName("taille")]
     private Collection $menuTailles;
 

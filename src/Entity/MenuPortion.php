@@ -18,14 +18,14 @@ class MenuPortion
     private $id;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write",'details:read:all'])]
     private $quantitePortion;
 
     #[ORM\ManyToOne(inversedBy: 'menuPortions')]
     private ?Menu $menus = null;
 
     #[ORM\ManyToOne(inversedBy: 'menuPortions')]
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write",'details:read:all'])]
     private ?PortionFrite $portionFrites = null;
 
     // #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menuPortions')]

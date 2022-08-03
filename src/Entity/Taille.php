@@ -45,25 +45,26 @@ class Taille
 {
 
     // #[Groups(["boisson:read:all","write","taille:read:all","complements"])]
-    #[Groups(["menu:write", "boisson:read:all", "write", "taille:read:all", "complements"])]
+    #[Groups(['details:read:all',"menu:write", "boisson:read:all", "write", "taille:read:all", "complements"])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
 
 
-    #[Groups(["write","taille:read:all", "complements"])]
+    #[Groups(['details:read:all',"write","taille:read:all", "complements"])]
     #[ORM\Column(type: 'integer',)]
     private $prix;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["write","taille:read:all", "complements"])]
+    #[Groups(['details:read:all',"write","taille:read:all", "complements"])]
     private $libelle;
 
     #[ORM\OneToMany(mappedBy: 'tailles', targetEntity: MenuTaille::class)]
     private Collection $menuTailles;
 
     #[ORM\OneToMany(mappedBy: 'taille', targetEntity: TailleBoisson::class)]
+    #[Groups('details:read:all')]
     private Collection $tailleBoissons;
 
     // #[ORM\ManyToMany(targetEntity: Boisson::class, inversedBy: 'tailles')]

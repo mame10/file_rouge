@@ -32,15 +32,17 @@ class DataProviderDetails implements ItemDataProviderInterface,RestrictedDataPro
     {
         $detailsProduit= new Details();
         $detailsProduit->id = $id;
-        $detailsProduit->burger = $this->burgers->find($id);
-        $detailsProduit->menu = $this->menus->find($id);
+        $menu = $this->burgers->find($id);
+        $burger=$this->menus->find($id);
+        if($menu==null){
+            $detailsProduit->produit=$burger;
+        }
+        if($burger==null){
+            $detailsProduit->produit=$menu;
+        }
         $detailsProduit->boissons = $this->boissons->findAll(['isEtat'=> true]);
         $detailsProduit->portions= $this->portions->findAll(['isEtat'=> true]);
         return $detailsProduit;
-        // $detailsProduit->id = $id;
-        // ($this-> menus->findOneBy(['id' => $id, 'isEtat'=>true]) !=null)?
-        // $detailsProduit->burger = $this->burgers->findOneBy(['id' => $id, 'isEtat'=> true]):
-        // $detailsProduit->boisson = $this->boissons->findBy(['isEtat'=> true]);
-        // $detailsProduit->portion= $this->portions->findBy(['isEtat'=> true]);
+    
     }
 }

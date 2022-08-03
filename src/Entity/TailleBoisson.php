@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\TailleBoissonRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: TailleBoissonRepository::class)]
 class TailleBoisson
@@ -14,9 +16,12 @@ class TailleBoisson
     private $id;
 
     #[ORM\Column(type: 'float')]
+    #[Groups('details:read:all')]
+    #[SerializedName('quantiteStock')]
     private $quantite;
 
     #[ORM\ManyToOne(inversedBy: 'tailleBoisson')]
+    #[Groups('details:read:all')]
     private ?Boisson $boisson = null;
 
     #[ORM\ManyToOne(inversedBy: 'tailleBoissons')]

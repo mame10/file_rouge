@@ -18,12 +18,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Details{
     #[Groups('details:read:all')]
     public $id;
-
+    
     #[Groups('details:read:all')]
-    public $menu;
-
-    #[Groups('details:read:all')]
-    public $burger;
+    public $produit;
 
     #[Groups('details:read:all')]
     public array $boissons;

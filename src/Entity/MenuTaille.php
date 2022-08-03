@@ -22,7 +22,7 @@ class MenuTaille
     
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write",'details:read:all'])]
     private $quantiteBoisson;
 
     // #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menutailles')]
@@ -36,7 +36,7 @@ class MenuTaille
     private ?Menu $menus = null;
 
     #[ORM\ManyToOne(inversedBy: 'menuTailles')]
-    #[Groups(["menu:write"])]
+    #[Groups(["menu:write",'details:read:all'])]
     private ?Taille $tailles = null;
 
     public function getId(): ?int

@@ -64,6 +64,8 @@ class Produit
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'produits')]
     private $user;
 
+    
+
     public function __construct()
     {
         $this->produitCommandes = new ArrayCollection();
@@ -185,4 +187,5 @@ class Produit
 
         return $this;
     }
+
 }

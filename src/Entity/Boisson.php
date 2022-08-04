@@ -49,6 +49,8 @@ class Boisson extends Produit
     #[ORM\OneToMany(mappedBy: 'boisson', targetEntity: TailleBoisson::class)]
     private $tailleBoisson;
 
+   
+
     public function __construct()
     {
         
@@ -116,6 +118,5 @@ class Boisson extends Produit
         return $this;
     }
 
-    
 
 }

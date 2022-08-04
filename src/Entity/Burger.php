@@ -51,6 +51,7 @@ class Burger extends Produit
 #[ORM\OneToMany(mappedBy: 'burger', targetEntity: MenuBurger::class)]
 private Collection $menuBurger;
 
+
     //    #[ORM\OneToMany(mappedBy: 'burger', targetEntity: BurgerCommande::class,cascade:['persist'])]
 //    private $burgerCommandes;
 
@@ -117,7 +118,5 @@ private Collection $menuBurger;
 
         return $this;
     }
-
-   
 
 }

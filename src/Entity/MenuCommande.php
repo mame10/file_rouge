@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\MenuCommandeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\MenuCommandeRepository;
+use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MenuCommandeRepository::class)]
 #[ApiResource()]
@@ -13,17 +14,19 @@ class MenuCommande
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups('commande')]
     private $id;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups('commande')]
     private $quantite;
 
     #[ORM\ManyToOne(targetEntity: Menu::class,inversedBy: 'menuCommandes')]
+    #[Groups('commande')]
     private $menus;
 
     #[ORM\ManyToOne(targetEntity: Commande::class,inversedBy: 'menuCommandes')]
     private $commandes;
-
 
     public function getId(): ?int
     {

@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BoissonRepository::class)]
 #[ApiResource(
@@ -43,49 +44,14 @@ use Doctrine\Common\Collections\ArrayCollection;
  
 class Boisson extends Produit
 {
-    #[ORM\OneToMany(mappedBy: 'boissons', targetEntity: BoissonCommande::class)]
-    private $boissonCommandes;
 
-    #[ORM\OneToMany(mappedBy: 'boisson', targetEntity: TailleBoisson::class)]
+    #[ORM\OneToMany(mappedBy: 'boisson', targetEntity: TailleBoisson::class,cascade:['persist'])]
+    #[Groups('boisson:read:all')]
     private $tailleBoisson;
-
-   
 
     public function __construct()
     {
-        
-        $this->boissonCommandes = new ArrayCollection();
         $this->tailleBoisson = new ArrayCollection();
-    }
-
-    /**
-     * @return Collection<int, BoissonCommande>
-     */
-    public function getBoissonCommandes(): Collection
-    {
-        return $this->boissonCommandes;
-    }
-
-    public function addBoissonCommande(BoissonCommande $boissonCommande): self
-    {
-        if (!$this->boissonCommandes->contains($boissonCommande)) {
-            $this->boissonCommandes->add($boissonCommande);
-            $boissonCommande->setBoissons($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBoissonCommande(BoissonCommande $boissonCommande): self
-    {
-        if ($this->boissonCommandes->removeElement($boissonCommande)) {
-            // set the owning side to null (unless already changed)
-            if ($boissonCommande->getBoissons() === $this) {
-                $boissonCommande->setBoissons(null);
-            }
-        }
-
-        return $this;
     }
 
     /**
@@ -114,9 +80,6 @@ class Boisson extends Produit
                 $tailleBoisson->setBoisson(null);
             }
         }
-
         return $this;
     }
-
-
 }

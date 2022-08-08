@@ -27,7 +27,7 @@ class Produit
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['catologue','details:read:all',"burger:read:simple", "burger:read:all", "user:read:simple", "boisson:read:all", "portion:read:all", "menu:read:all", "write", "menu:read:simple", 'menu:write'])]
+    #[Groups(['comande:read','commande','catologue','details:read:all',"burger:read:simple", "burger:read:all", "user:read:simple", "boisson:read:all", "portion:read:all", "menu:read:all", "write", "menu:read:simple", 'menu:write'])]
     protected $id;
 
     #[Groups(['details:read:all',"burger:read:simple", "burger:read:all", "boisson:read:all", "portion:read:all", "write", "complements", "catologue", "menu:write", 'menu:read:all'])]
@@ -48,9 +48,6 @@ class Produit
     #[Groups(['details:read:all','menu:read:all', "burger:read:all", "boisson:read:all", "complements", "catologue", "menu:read:all"])]
     protected $isEtat = true;
 
-    // #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'produits')]
-    // private $gestionnaire;
-
     #[SerializedName('images')]
     #[Groups(["burger:read:simple", "menu:write", "burger:read:all", "boisson:read:all", "boisson:read:simple", "portion:read:all", "portion:read:simple", "write"])]
     private string $imageFile;
@@ -58,17 +55,13 @@ class Produit
     #[ORM\ManyToOne(targetEntity: Gestionnaire::class, inversedBy: 'produits')]
     private $gestionnaire;
 
-    #[ORM\OneToMany(mappedBy: 'produit', targetEntity: ProduitCommande::class)]
-    private Collection $produitCommandes;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'produits')]
-    private $user;
-
-    
+    private $user;  
 
     public function __construct()
     {
-        $this->produitCommandes = new ArrayCollection();
+        
     }
     public function getId(): ?int
     {
@@ -142,36 +135,6 @@ class Produit
     public function setGestionnaire(?Gestionnaire $gestionnaire): self
     {
         $this->gestionnaire = $gestionnaire;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ProduitCommande>
-     */
-    public function getProduitCommandes(): Collection
-    {
-        return $this->produitCommandes;
-    }
-
-    public function addProduitCommande(ProduitCommande $produitCommande): self
-    {
-        if (!$this->produitCommandes->contains($produitCommande)) {
-            $this->produitCommandes->add($produitCommande);
-            $produitCommande->setProduit($this);
-        }
-
-        return $this;
-    }
-
-    public function removeProduitCommande(ProduitCommande $produitCommande): self
-    {
-        if ($this->produitCommandes->removeElement($produitCommande)) {
-            // set the owning side to null (unless already changed)
-            if ($produitCommande->getProduit() === $this) {
-                $produitCommande->setProduit(null);
-            }
-        }
 
         return $this;
     }

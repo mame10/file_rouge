@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Menu;
-use phpDocumentor\Reflection\Types\Float_;
+
 
 class CalculPriceMenuService implements ICalculPriceMenuService
 {
@@ -20,7 +20,6 @@ class CalculPriceMenuService implements ICalculPriceMenuService
             $prix += $menu->getPrix() * $burger->getQuantite();
         }
         foreach ($data->getMenutailles() as $taille) {
-
             $prix += $taille->getTailles()->getPrix() * $taille->getQuantiteBoisson();
         }
         foreach ($data->getMenuPortions() as $portion) {

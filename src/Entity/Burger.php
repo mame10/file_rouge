@@ -45,10 +45,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Burger extends Produit
 {
    
-#[ORM\OneToMany(mappedBy: 'burger', targetEntity: BurgerCommande::class)]
+#[ORM\OneToMany(mappedBy: 'burger', targetEntity: BurgerCommande::class,cascade:['persist'])]
     private Collection $burgerCommande;
 
-#[ORM\OneToMany(mappedBy: 'burger', targetEntity: MenuBurger::class)]
+#[ORM\OneToMany(mappedBy: 'burger', targetEntity: MenuBurger::class,cascade:['persist'])]
 private Collection $menuBurger;
 
 

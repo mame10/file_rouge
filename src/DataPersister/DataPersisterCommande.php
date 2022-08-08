@@ -1,62 +1,49 @@
 <?php
-
 namespace App\DataPersister;
 
-use App\Entity\Menu;
-use App\Entity\Produit;
-// use App\Services\CalculPriceMenuService;
+use App\Entity\Commande;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Services\ICalculPriceMenuService;
+use App\Services\ICalculPriceCommandeService;
 use Symfony\Component\Security\Core\Security;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 
-class DataPersisterProduit implements DataPersisterInterface
+class DataPersisterCommande implements DataPersisterInterface
 {
     private $entityManager;
     private $security;
-
-    private ICalculPriceMenuService $pricemenu;
-    // private $security;
+    private ICalculPriceCommandeService $pricecommande;
     private TokenStorageInterface $tokenStorage;
 
-    public function __construct(TokenStorageInterface $tokenStorage, Security $security, ICalculPriceMenuService $pricemenu, EntityManagerInterface $entityManager)
+    public function __construct(TokenStorageInterface $tokenStorage, Security $security, ICalculPriceCommandeService $pricecmd, EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->pricemenu = $pricemenu;
+        $this->pricecommande = $pricecmd;
         $this->security = $security;
         $this->tokenStorage = $tokenStorage;
     }
-
     /**
      * {@inheritdoc}
      */
     public function supports($data, array $context = []): bool
     {
-        return $data instanceof Produit;
+        return $data instanceof Commande;
     }
 
    /**
-     * @param Produit $data
+     * @param Commande $data
      */
     public function persist($data, array $context = [])
-    {
-
-        if ($data instanceof Produit) {
-            if ($data->getImageFile()) {
-                $data->setImage(file_get_contents($data->getImageFile()));
-            }
-        }
-        if ($data instanceof Produit) {
-            $data->setGestionnaire($this->tokenStorage->getToken()->getUser());
+    { 
+        if ($data instanceof Commande) {
+            $data->setClient($this->tokenStorage->getToken()->getUser());
         }
 
-        if ($data instanceof Menu) {
-            $prix = $this->pricemenu->PriceMenu($data);
-            $data->setPrix($prix);
+        if ($data instanceof Commande) {
+            $prix = $this->pricecommande->PriceCommande($data);
+            $data->setMontant($prix);
         }
-
         $this->entityManager->persist($data);
         $this->entityManager->flush();
     }

@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CommandeRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+// use ApiPlatform\Core\Annotation\ApiSubresource;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -35,7 +35,7 @@ class Commande
     private $id;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups('commande','comande:read')]
+    #[Groups('comande:read')]
     private $numero;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -47,16 +47,12 @@ class Commande
     private $etat='En_cours';
 
     #[ORM\Column(type: 'integer')]
-    #[Groups('commande','comande:read')]
+    #[Groups('comande:read')]
     private $montant;
 
     #[ORM\OneToMany(mappedBy: 'commandes', targetEntity: BurgerCommande::class,cascade:(['persist']))]
     #[Groups('commande')]
     private Collection $burgerCommandes;
-
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: BoissonCommande::class,cascade:['persist'])]
-    #[Groups('commande')]
-    private Collection $boissonCommandes;
 
     #[ORM\OneToMany(mappedBy: 'commandes', targetEntity: MenuCommande::class,cascade:['persist'])]
     #[Groups('commande')]
@@ -67,17 +63,19 @@ class Commande
     private Collection $portionCommandes;
 
     #[ORM\ManyToOne(targetEntity: Zone::class, inversedBy: 'commande')]
+    #[Groups('commande','comande-read')]
     private $zone ;
 
     #[ORM\ManyToOne(targetEntity: Client::class,inversedBy: 'commande')]
-    #[Groups('commande')]
+    #[Groups('comande:read')]
     private  $client ;
 
     #[ORM\ManyToOne(inversedBy: 'commandes')]
     private ?Gestionnaire $gestionnaire = null;
 
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: ProduitCommande::class,cascade:['persist'])]
-    private Collection $produitCommandes;
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeTailleBoisson::class,cascade:['persist'])]
+    #[Groups('commande')]
+    private Collection $commandeTailleBoissons;
 
     public function __construct()
     {
@@ -86,7 +84,8 @@ class Commande
         $this->menuCommandes = new ArrayCollection();
         $this->boissonCommandes = new ArrayCollection();
         $this->date = new \DateTime();
-        $this->produitCommandes = new ArrayCollection();
+        $this->numero = "NUM".date('ymdhis');
+        $this->commandeTailleBoissons = new ArrayCollection();
 
     }
     public function getId(): ?int
@@ -166,36 +165,6 @@ class Commande
             // set the owning side to null (unless already changed)
             if ($burgerCommande->getCommandes() === $this) {
                 $burgerCommande->setCommandes(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, BoissonCommande>
-     */
-    public function getBoissonCommandes(): Collection
-    {
-        return $this->boissonCommandes;
-    }
-
-    public function addBoissonCommande(BoissonCommande $boissonCommande): self
-    {
-        if (!$this->boissonCommandes->contains($boissonCommande)) {
-            $this->boissonCommandes->add($boissonCommande);
-            $boissonCommande->setCommande($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBoissonCommande(BoissonCommande $boissonCommande): self
-    {
-        if ($this->boissonCommandes->removeElement($boissonCommande)) {
-            // set the owning side to null (unless already changed)
-            if ($boissonCommande->getCommande() === $this) {
-                $boissonCommande->setCommande(null);
             }
         }
 
@@ -311,29 +280,29 @@ class Commande
     }
 
     /**
-     * @return Collection<int, ProduitCommande>
+     * @return Collection<int, CommandeTailleBoisson>
      */
-    public function getProduitCommandes(): Collection
+    public function getCommandeTailleBoissons(): Collection
     {
-        return $this->produitCommandes;
+        return $this->commandeTailleBoissons;
     }
 
-    public function addProduitCommande(ProduitCommande $produitCommande): self
+    public function addCommandeTailleBoisson(CommandeTailleBoisson $commandeTailleBoisson): self
     {
-        if (!$this->produitCommandes->contains($produitCommande)) {
-            $this->produitCommandes->add($produitCommande);
-            $produitCommande->setCommande($this);
+        if (!$this->commandeTailleBoissons->contains($commandeTailleBoisson)) {
+            $this->commandeTailleBoissons->add($commandeTailleBoisson);
+            $commandeTailleBoisson->setCommande($this);
         }
 
         return $this;
     }
 
-    public function removeProduitCommande(ProduitCommande $produitCommande): self
+    public function removeCommandeTailleBoisson(CommandeTailleBoisson $commandeTailleBoisson): self
     {
-        if ($this->produitCommandes->removeElement($produitCommande)) {
+        if ($this->commandeTailleBoissons->removeElement($commandeTailleBoisson)) {
             // set the owning side to null (unless already changed)
-            if ($produitCommande->getCommande() === $this) {
-                $produitCommande->setCommande(null);
+            if ($commandeTailleBoisson->getCommande() === $this) {
+                $commandeTailleBoisson->setCommande(null);
             }
         }
 

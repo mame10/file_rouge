@@ -5,7 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\BurgerCommandeRepository;
-
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BurgerCommandeRepository::class)]
 #[ApiResource()]
@@ -14,17 +14,19 @@ class BurgerCommande
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups('commande')]
     private $id;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups('commande')]
     private $quantity;
 
     #[ORM\ManyToOne(targetEntity: Burger::class,inversedBy: 'burgerCommande')]
+    #[Groups('commande')]
     private $burger;
 
     #[ORM\ManyToOne(targetEntity: Commande::class,inversedBy: 'burgerCommandes')]
     private $commandes;
-
 
     public function getId(): ?int
     {

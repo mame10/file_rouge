@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\PortionCommandeRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PortionCommandeRepository::class)]
 #[ApiResource()]
@@ -14,19 +15,19 @@ class PortionCommande
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups('commande')]
     private $id;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups('commande')]
     private $quantite;
 
     #[ORM\ManyToOne(inversedBy: 'portionCommandes')]
+    #[Groups('commande')]
     private ?PortionFrite $portions = null;
 
     #[ORM\ManyToOne(inversedBy: 'portionCommandes')]
     private ?Commande $commandes = null;
-
-    #[ORM\ManyToOne(inversedBy: 'produitCommande')]
-    private ?Produit $produit = null;
 
     // #[ORM\ManyToOne(targetEntity: PortionFrite::class, inversedBy: 'portionCommandes')]
     // private $portion;

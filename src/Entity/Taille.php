@@ -45,12 +45,11 @@ class Taille
 {
 
     // #[Groups(["boisson:read:all","write","taille:read:all","complements"])]
-    #[Groups(['details:read:all',"menu:write", "boisson:read:all", "write", "taille:read:all", "complements"])]
+    #[Groups(['boisson:read:all','commande','details:read:all',"menu:write", "boisson:read:all", "write", "taille:read:all", "complements"])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
-
 
     #[Groups(['details:read:all',"write","taille:read:all", "complements"])]
     #[ORM\Column(type: 'integer',)]
@@ -60,31 +59,19 @@ class Taille
     #[Groups(['details:read:all',"write","taille:read:all", "complements"])]
     private $libelle;
 
-    #[ORM\OneToMany(mappedBy: 'tailles', targetEntity: MenuTaille::class)]
+    #[ORM\OneToMany(mappedBy: 'tailles', targetEntity: MenuTaille::class,cascade:['persist'])]
     private Collection $menuTailles;
 
-    #[ORM\OneToMany(mappedBy: 'taille', targetEntity: TailleBoisson::class)]
+    #[ORM\OneToMany(mappedBy: 'taille', targetEntity: TailleBoisson::class,cascade:['persist'])]
     #[Groups('details:read:all')]
     private Collection $tailleBoissons;
-
-    // #[ORM\ManyToMany(targetEntity: Boisson::class, inversedBy: 'tailles')]
-    // private $boissons;
-
-    // #[ORM\OneToMany(mappedBy: 'taille', targetEntity: MenuTaille::class)]
-    // private $tailleMenus;
-
-    // #[ORM\OneToMany(mappedBy: 'taille', targetEntity: TailleBoisson::class, cascade: ['persist'])]
-    // private $tailleBoissons;
-
 
 
     public function __construct()
     {
 
-        // $this->boissons = new ArrayCollection();
-        // $this->tailleMenus = new ArrayCollection();
-        // $this->tailleMenus = new ArrayCollection();
-        // $this->tailleBoissons = new ArrayCollection();
+        $this->menuTailles = new ArrayCollection();
+        $this->tailleBoissons = new ArrayCollection();
         $this->menuTailles = new ArrayCollection();
     }
 

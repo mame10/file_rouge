@@ -20,17 +20,9 @@ class MenuTaille
     #[Groups(["menu:write"])]
     private $id;
     
-
     #[ORM\Column(type: 'integer')]
     #[Groups(["menu:write",'details:read:all'])]
     private $quantiteBoisson;
-
-    // #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'menutailles')]
-    // private $menu;
-
-    // #[ORM\ManyToOne(targetEntity: Taille::class, inversedBy: 'tailleMenus')]
-    // #[Groups(["menu:write"])]
-    // private $taille;
 
     #[ORM\ManyToOne(inversedBy: 'menuTailles')]
     private ?Menu $menus = null;

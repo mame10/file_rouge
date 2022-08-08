@@ -24,8 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
     itemOperations: [
         "get",
-        "put",
-        "patch"
+        "put"
     ]
 )]
 class Zone
@@ -33,17 +32,16 @@ class Zone
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["write", "zone:read:all"])]
+    #[Groups(["write", "zone:read:all",'quartier','commande','comande-read'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["write", "zone:read:all"])]
+    #[Groups(["write", "zone:read:all",'quartier:read:all'])]
     private $nom;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(["write", "zone:read:all"])]
+    #[Groups(["write", "zone:read:all",'quartier:read:all'])]
     private $prix;
-
     
     #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Quartiers::class,cascade:['persist'])]
     #[Groups(["write", "zone:read:all"])]
@@ -52,19 +50,10 @@ class Zone
     #[ORM\OneToMany(mappedBy: 'zones', targetEntity: Commande::class,cascade:['persist'])]
     private Collection $commandes;
 
-    // #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Commande::class)]
-    // #[Groups(["zone:read:all"])]
-    // private $commandes;
-
-    // #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Quartiers::class, cascade: ["persist"])]
-    // #[Groups(["zone"])]
-    // #[ApiSubresource()]
-    // private $quartiers;
-
+   
     public function __construct()
     {
-        // $this->commandes = new ArrayCollection();
-        // $this->quartiers = new ArrayCollection();
+ 
         $this->commandes = new ArrayCollection();
         $this->quartier = new ArrayCollection();
     }

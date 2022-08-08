@@ -33,10 +33,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 class PortionFrite extends Produit
 {
 
-    #[ORM\OneToMany(mappedBy: 'portionFrites', targetEntity: MenuPortion::class)]
+    #[ORM\OneToMany(mappedBy: 'portionFrites', targetEntity: MenuPortion::class,cascade:['persist'])]
     private Collection $menuPortions;
 
-    #[ORM\OneToMany(mappedBy: 'portions', targetEntity: PortionCommande::class)]
+    #[ORM\OneToMany(mappedBy: 'portions', targetEntity: PortionCommande::class,cascade:['persist'])]
     private Collection $portionCommandes;
 
     public function __construct()

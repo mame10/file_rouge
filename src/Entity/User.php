@@ -74,7 +74,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(["write",'user:read:all'])]
     protected $expireAt;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Produit::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Produit::class,cascade:['persist'])]
     private Collection $produits;
 
 

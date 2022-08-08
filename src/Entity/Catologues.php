@@ -5,7 +5,6 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Common\Collections\ArrayCollection;
-// use Symfony\Component\Validator\Constraints\Collection;
 
 #[ApiResource(
     collectionOperations:[
@@ -30,6 +29,4 @@ class Catologues
         $this->burgers = new ArrayCollection();
         $this->menus = new ArrayCollection();
     }
-    
-
 }

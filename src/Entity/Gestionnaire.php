@@ -36,12 +36,6 @@ class Gestionnaire extends User
     #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Produit::class)]
     private Collection $produits;
 
-    // #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Commande::class)]
-    // private $commandes;
-
-    // #[ORM\OneToMany(mappedBy: 'gestionnaire', targetEntity: Produit::class)]
-    // private $produits;
-
     public function __construct()
     {
         $this->commandes = new ArrayCollection();

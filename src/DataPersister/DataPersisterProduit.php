@@ -4,7 +4,6 @@ namespace App\DataPersister;
 
 use App\Entity\Menu;
 use App\Entity\Produit;
-// use App\Services\CalculPriceMenuService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Services\ICalculPriceMenuService;
 use Symfony\Component\Security\Core\Security;

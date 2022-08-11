@@ -45,10 +45,6 @@ class Client extends User
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Commande::class)]
     private Collection $commande;
 
-    // #[ORM\OneToMany(mappedBy: 'client', targetEntity: Commande::class)]
-    // // #[ApiSubresource]
-    // private $commandes;
-
     public function __construct()
     {
         $this->setRoles(['ROLE_CLIENT']);

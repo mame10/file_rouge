@@ -6,32 +6,37 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CommandeRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-// use ApiPlatform\Core\Annotation\ApiSubresource;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints\Cascade;
+
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
+
 #[ApiResource(
-    collectionOperations:[
-        "get",
+    collectionOperations: [
+        "get" => [
+            "method"=> "get",
+            "security" => "is_granted('ROLE_CLIENT')",
+            "security_message"=>"Vous n'avez pas access à cette Ressource",
+            'normalization_context' => ['groups' => ['comande:read']]
+        ],
         "post" => [
-        "method"=>"post",
-        'denormalization_context' => ['groups' => ['commande']],
-        'normalization_context' => ['groups' => ['comande:read']]
+            "method" => "post",
+            'denormalization_context' => ['groups' => ['commande']],
+            'normalization_context' => ['groups' => ['comande:read']]
         ]
     ],
-        itemOperations:[
-            "get","patch"
-        ]
+    itemOperations: [
+        "get"
+    ]
 )]
 class Commande
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups('commande','comande:read')]
+    #[Groups('commande', 'comande:read')]
     private $id;
 
     #[ORM\Column(type: 'integer')]
@@ -44,36 +49,36 @@ class Commande
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups('comande:read')]
-    private $etat='En_cours';
+    private $etat = 'En_cours';
 
     #[ORM\Column(type: 'integer')]
     #[Groups('comande:read')]
     private $montant;
 
-    #[ORM\OneToMany(mappedBy: 'commandes', targetEntity: BurgerCommande::class,cascade:(['persist']))]
+    #[ORM\OneToMany(mappedBy: 'commandes', targetEntity: BurgerCommande::class, cascade: ['persist'])]
     #[Groups('commande')]
     private Collection $burgerCommandes;
 
-    #[ORM\OneToMany(mappedBy: 'commandes', targetEntity: MenuCommande::class,cascade:['persist'])]
+    #[ORM\OneToMany(mappedBy: 'commandes', targetEntity: MenuCommande::class, cascade: ['persist'])]
     #[Groups('commande')]
     private Collection $menuCommandes;
 
-    #[ORM\OneToMany(mappedBy: 'commandes', targetEntity: PortionCommande::class,cascade:['persist'])]
+    #[ORM\OneToMany(mappedBy: 'commandes', targetEntity: PortionCommande::class, cascade: ['persist'])]
     #[Groups('commande')]
     private Collection $portionCommandes;
 
     #[ORM\ManyToOne(targetEntity: Zone::class, inversedBy: 'commande')]
-    #[Groups('commande','comande-read')]
-    private $zone ;
+    #[Groups('commande', 'comande-read')]
+    private $zone;
 
-    #[ORM\ManyToOne(targetEntity: Client::class,inversedBy: 'commande')]
+    #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'commande')]
     #[Groups('comande:read')]
-    private  $client ;
+    private  $client;
 
     #[ORM\ManyToOne(inversedBy: 'commandes')]
     private ?Gestionnaire $gestionnaire = null;
 
-    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeTailleBoisson::class,cascade:['persist'])]
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeTailleBoisson::class, cascade: ['persist'])]
     #[Groups('commande')]
     private Collection $commandeTailleBoissons;
 
@@ -83,10 +88,9 @@ class Commande
         $this->portionCommandes = new ArrayCollection();
         $this->menuCommandes = new ArrayCollection();
         $this->boissonCommandes = new ArrayCollection();
-        $this->date = new \DateTime();
-        $this->numero = "NUM".date('ymdhis');
         $this->commandeTailleBoissons = new ArrayCollection();
-
+        $this->date = new \DateTime();
+        $this->numero = "NUM" . date('ymdhis');
     }
     public function getId(): ?int
     {
@@ -305,9 +309,6 @@ class Commande
                 $commandeTailleBoisson->setCommande(null);
             }
         }
-
         return $this;
     }
-
-    
 }

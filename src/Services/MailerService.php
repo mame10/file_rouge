@@ -21,7 +21,7 @@ class MailerService
     {
         $email = (new Email())
             ->from('mame@mamemalick.com')
-            ->to($user->getLogin())
+            ->to('mame@mamemalick.com')
             ->subject($object)
             ->html($this->twig->render('mailer/index.html.twig', ['user' => $user]));
 

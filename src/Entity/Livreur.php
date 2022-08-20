@@ -5,52 +5,46 @@ namespace App\Entity;
 use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\LivreurRepository;
-use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+
 
 #[ORM\Entity(repositoryClass: LivreurRepository::class)]
 #[ApiResource(
     collectionOperations: [
-        "get",
-        "post"
+        "get"=> [
+            "method" => "get",
+            "normalization_context" =>['groups' => ['write']]
+        ],
+        "post" => [
+            "method" =>"post",
+            "security" => "is_granted('ROLE_GESTIONNAIRE')",
+            "security_message" => "Vous n'avez pas access à cette Ressource",
+            'denormalization_context' => [ 'groups' => ['liv']]
+         ]
     ],
     itemOperations: [
-        "get",
-        "put"
+        "get","put"
     ]
 )]
 class Livreur extends User
 {
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private $matriculeMoto;
-
+    #[Groups(['liv','write'])]
     #[ORM\Column(type: 'string', length: 255)]
     private $telephone;
 
+    #[Groups('write')]
     #[ORM\Column(type: 'string', length: 255)]
-    private $etat;
+    private $etat = 'disponible';
 
-    // #[ORM\OneToMany(mappedBy: 'livreur', targetEntity: Livraison::class)]
-    // private $livraisons;
+    #[ORM\Column(length: 255)]
+    #[Groups(['liv','write'])]
+    private ?string $matricule = null;
 
     public function __construct()
     {
-        // $this->livraisons = new ArrayCollection();
-    }
-
-
-    public function getMatriculeMoto(): ?string
-    {
-        return $this->matriculeMoto;
-    }
-
-    public function setMatriculeMoto(string $matriculeMoto): self
-    {
-        $this->matriculeMoto = $matriculeMoto;
-
-        return $this;
+        $this->setRoles(['ROLE_LIVREUR']);
     }
 
     public function getTelephone(): ?string
@@ -77,7 +71,15 @@ class Livreur extends User
         return $this;
     }
 
-   
+    public function getMatricule(): ?string
+    {
+        return $this->matricule;
+    }
 
-  
+    public function setMatricule(string $matricule): self
+    {
+        $this->matricule = $matricule;
+
+        return $this;
+    }
 }

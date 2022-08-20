@@ -49,6 +49,7 @@ class DataPersisterProduit implements DataPersisterInterface
         }
         if ($data instanceof Produit) {
             $data->setGestionnaire($this->tokenStorage->getToken()->getUser());
+            // $data->setGestionnaire($this->security->getUser())
         }
 
         if ($data instanceof Menu) {
@@ -68,4 +69,6 @@ class DataPersisterProduit implements DataPersisterInterface
         $this->entityManager->remove($data);
         $this->entityManager->flush();
     }
+
+    
 }

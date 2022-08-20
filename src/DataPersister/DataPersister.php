@@ -5,8 +5,10 @@ namespace App\DataPersister;
 use App\Entity\User;
 use App\Services\MailerService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class DataPersister implements DataPersisterInterface
@@ -50,7 +52,7 @@ class DataPersister implements DataPersisterInterface
                 $data->eraseCredentials();
                 $data->setToken($this->generateToken());
             }
-            $this->mailerService->SendEmail($data, $data->getToken());
+            $this->mailerService->SendEmail($data,$data->getToken());
         }
         $this->entityManager->persist($data);
         $this->entityManager->flush();
@@ -68,5 +70,18 @@ class DataPersister implements DataPersisterInterface
     private function generateToken()
     {
         return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+    }
+
+
+    public function onAuthenticationSuccessResponse(AuthenticationSuccessEvent $event)
+    {
+        $data = $event->getData();
+        $user = $event->getUser();
+        if (!$user instanceof UserInterface) {
+            return;
+        }
+        $data['id'] = $user->getId();
+        $event->setData($data);
+        // dd($event);
     }
 }

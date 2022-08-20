@@ -25,6 +25,7 @@ class CalculPriceMenuService implements ICalculPriceMenuService
         foreach ($data->getMenuPortions() as $portion) {
             $prix += $portion->getPortionFrites()->getPrix() * $portion->getQuantitePortion();
         }
+        
         return $prix;
     }
 }

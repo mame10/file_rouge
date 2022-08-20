@@ -2,11 +2,16 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CommandeTailleBoissonRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CommandeTailleBoissonRepository::class)]
+#[ApiResource(
+    collectionOperations:['get'],
+    itemOperations:['get']
+)]
 class CommandeTailleBoisson
 {
     #[ORM\Id]
@@ -24,7 +29,7 @@ class CommandeTailleBoisson
 
     #[ORM\ManyToOne(inversedBy: 'commandeTailleBoissons')]
     #[Groups('commande')]
-    private ?TailleBoisson $boisson = null;
+    private ?TailleBoisson $tailleBoisson = null;
 
     public function getId(): ?int
     {
@@ -55,14 +60,22 @@ class CommandeTailleBoisson
         return $this;
     }
 
-    public function getBoisson(): ?TailleBoisson
+    /**
+     * Get the value of tailleBoisson
+     */ 
+    public function getTailleBoisson()
     {
-        return $this->boisson;
+        return $this->tailleBoisson;
     }
 
-    public function setBoisson(?TailleBoisson $boisson): self
+    /**
+     * Set the value of tailleBoisson
+     *
+     * @return  self
+     */ 
+    public function setTailleBoisson($tailleBoisson)
     {
-        $this->boisson = $boisson;
+        $this->tailleBoisson = $tailleBoisson;
 
         return $this;
     }

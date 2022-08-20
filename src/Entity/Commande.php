@@ -17,14 +17,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
     collectionOperations: [
         "get" => [
             "method"=> "get",
-            "security" => "is_granted('ROLE_CLIENT')",
-            "security_message"=>"Vous n'avez pas access à cette Ressource",
             'normalization_context' => ['groups' => ['comande:read']]
         ],
         "post" => [
             "method" => "post",
+            "security" => "is_granted('ROLE_CLIENT')",
+            "security_message"=>"Vous n'avez pas access à cette Ressource",
             'denormalization_context' => ['groups' => ['commande']],
-            'normalization_context' => ['groups' => ['comande:read']]
+            // 'normalization_context' => ['groups' => ['comande:read']]
         ]
     ],
     itemOperations: [
@@ -36,14 +36,14 @@ class Commande
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups('commande', 'comande:read')]
+    #[Groups('commande','comande:read')]
     private $id;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'string')]
     #[Groups('comande:read')]
     private $numero;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'date', length: 255)]
     #[Groups('comande:read')]
     private $date;
 
@@ -67,12 +67,8 @@ class Commande
     #[Groups('commande')]
     private Collection $portionCommandes;
 
-    #[ORM\ManyToOne(targetEntity: Zone::class, inversedBy: 'commande')]
-    #[Groups('commande', 'comande-read')]
-    private $zone;
-
     #[ORM\ManyToOne(targetEntity: Client::class, inversedBy: 'commande')]
-    #[Groups('comande:read')]
+    // #[Groups('comande:read')]
     private  $client;
 
     #[ORM\ManyToOne(inversedBy: 'commandes')]
@@ -81,6 +77,13 @@ class Commande
     #[ORM\OneToMany(mappedBy: 'commande', targetEntity: CommandeTailleBoisson::class, cascade: ['persist'])]
     #[Groups('commande')]
     private Collection $commandeTailleBoissons;
+
+    #[Groups('commande','comande:read')]
+    #[ORM\ManyToOne(inversedBy: 'commandes')]
+    private ?Zone $zone = null;
+
+    #[ORM\ManyToOne(inversedBy: 'commandes')]
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -97,12 +100,12 @@ class Commande
         return $this->id;
     }
 
-    public function getNumero(): ?int
+    public function getNumero(): ?string
     {
         return $this->numero;
     }
 
-    public function setNumero(int $numero): self
+    public function setNumero(string $numero): self
     {
         $this->numero = $numero;
 
@@ -235,41 +238,20 @@ class Commande
         return $this;
     }
 
-    public function getZone(): ?Zone
-    {
-        return $this->zone;
-    }
-
-    public function setZone(?Zone $zone): self
-    {
-        $this->zone = $zone;
-
-        return $this;
-    }
-
+   
     public function getClient(): ?Client
     {
         return $this->client;
     }
 
-    public function setClient(?Client $client): self
+    public function setClient(?User $client): self
     {
         $this->client = $client;
 
         return $this;
     }
 
-    public function getZones(): ?Zone
-    {
-        return $this->zones;
-    }
-
-    public function setZones(?Zone $zones): self
-    {
-        $this->zones = $zones;
-
-        return $this;
-    }
+   
 
     public function getGestionnaire(): ?Gestionnaire
     {
@@ -309,6 +291,30 @@ class Commande
                 $commandeTailleBoisson->setCommande(null);
             }
         }
+        return $this;
+    }
+
+    public function getZone(): ?Zone
+    {
+        return $this->zone;
+    }
+
+    public function setZone(?Zone $zone): self
+    {
+        $this->zone = $zone;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
         return $this;
     }
 }

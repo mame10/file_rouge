@@ -6,7 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ZoneRepository;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -32,11 +31,11 @@ class Zone
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["write", "zone:read:all",'quartier','commande','comande-read'])]
+    #[Groups(["write", "zone:read:all",'quartier','commande','comande:read'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(["write", "zone:read:all",'quartier:read:all'])]
+    #[Groups(["write", "zone:read:all",'quartier:read:all','comande:read'])]
     private $nom;
 
     #[ORM\Column(type: 'integer')]
@@ -47,10 +46,10 @@ class Zone
     #[Groups(["write", "zone:read:all"])]
     private Collection $quartier;
 
-    #[ORM\OneToMany(mappedBy: 'zones', targetEntity: Commande::class,cascade:['persist'])]
+    #[ORM\OneToMany(mappedBy: 'zone', targetEntity: Commande::class,cascade:['persist'])]
     private Collection $commandes;
 
-   
+       
     public function __construct()
     {
  
@@ -92,28 +91,6 @@ class Zone
         return $this->commande;
     }
 
-    public function addCommande(commande $commande): self
-    {
-        if (!$this->commande->contains($commande)) {
-            $this->commande->add($commande);
-            $commande->setZone($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCommande(commande $commande): self
-    {
-        if ($this->commande->removeElement($commande)) {
-            // set the owning side to null (unless already changed)
-            if ($commande->getZone() === $this) {
-                $commande->setZone(null);
-            }
-        }
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Quartiers>
      */
@@ -150,6 +127,28 @@ class Zone
     public function getCommandes(): Collection
     {
         return $this->commandes;
+    }
+
+    public function addCommande(Commande $commande): self
+    {
+        if (!$this->commandes->contains($commande)) {
+            $this->commandes->add($commande);
+            $commande->setZone($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommande(Commande $commande): self
+    {
+        if ($this->commandes->removeElement($commande)) {
+            // set the owning side to null (unless already changed)
+            if ($commande->getZone() === $this) {
+                $commande->setZone(null);
+            }
+        }
+
+        return $this;
     }
 
 }

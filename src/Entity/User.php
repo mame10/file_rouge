@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\Collection;
@@ -35,11 +36,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["burger:read:all", "user:read:simple", "write",'user:write'])]
+    #[Groups(["burger:read:all", "user:read:simple", "write",'user:write','commande','liv'])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    #[Groups(["burger:read:all", "user:read:simple", "user:read:all", "write",'user:write'])]
+    #[Groups(["burger:read:all", "user:read:simple", "user:read:all", "write",'user:write','liv'])]
     protected $login;
 
     #[ORM\Column(type: 'json')]
@@ -47,15 +48,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected $roles = [];
 
     #[ORM\Column(type: 'string')]
-    #[Groups(["user:read:simple"])]
+    #[Groups(["user:read:simple",'write'])]
     protected $password;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(["user:read:simple", "user:read:all", "write",'user:write'])]
+    #[Groups(["user:read:simple", "user:read:all", "write",'user:write','liv'])]
     protected $nom;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(["user:read:simple", "user:read:all", "write",'user:write'])]
+    #[Groups(["user:read:simple", "user:read:all", "write",'user:write','liv'])]
     protected $prenom;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -63,7 +64,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected $token;
 
     #[SerializedName("password")]
-    #[Groups(["write",'user:write'])]
+    #[Groups(["write",'user:write','liv'])]
     protected $plainPassword;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
@@ -73,10 +74,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Produit::class,cascade:['persist'])]
     private Collection $produits;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Commande::class)]
+    #[Groups('write','user:read:all')]
+    private Collection $commandes;
+
 
     public function __construct()
     {
        $this->expireAt = new \DateTime();
+       $this->commandes = new ArrayCollection();
+       
     }
 
     public function getId(): ?int
@@ -237,4 +244,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * @return Collection<int, Commande>
+     */
+    public function getCommandes(): Collection
+    {
+        return $this->commandes;
+    }
+
+    public function addCommande(Commande $commande): self
+    {
+        if (!$this->commandes->contains($commande)) {
+            $this->commandes->add($commande);
+            $commande->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommande(Commande $commande): self
+    {
+        if ($this->commandes->removeElement($commande)) {
+            // set the owning side to null (unless already changed)
+            if ($commande->getUser() === $this) {
+                $commande->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+
+   
 }

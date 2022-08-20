@@ -29,15 +29,18 @@ class Livraison
     #[ORM\Column(type: 'integer')]
     private $montantTotal;
 
-    // #[ORM\OneToMany(mappedBy: 'livraison', targetEntity: Commande::class)]
-    // private $commandes;
+    #[ORM\ManyToOne(inversedBy: 'livraisons')]
+    private ?Livreur $livreur = null;
+
+    #[ORM\OneToMany(mappedBy: 'livraison', targetEntity: Commande::class)]
+    private $commandes;
 
     // #[ORM\ManyToOne(targetEntity: Livreur::class, inversedBy: 'livraisons')]
     // private $livreur;
 
     public function __construct()
     {
-        // $this->commandes = new ArrayCollection();
+        $this->commandes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -63,6 +66,18 @@ class Livraison
     public function getCommandes(): Collection
     {
         return $this->commandes;
+    }
+
+    public function getLivreur(): ?Livreur
+    {
+        return $this->livreur;
+    }
+
+    public function setLivreur(?Livreur $livreur): self
+    {
+        $this->livreur = $livreur;
+
+        return $this;
     }
 
 

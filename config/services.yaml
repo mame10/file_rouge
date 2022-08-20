@@ -10,7 +10,11 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true     # Automatically registers your services as commands, event subscribers, etc.
-        
+
+    acme_api.event.authentication_success_listener:
+        class: App\DataPersister\DataPersister
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccessResponse }  
     # App\EventSubscriber\UserSubscriber: 
     #     tags:
     #         - { name: doctrine.event_listener, event: prePersist }

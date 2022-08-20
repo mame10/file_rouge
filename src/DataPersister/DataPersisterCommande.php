@@ -36,8 +36,11 @@ class DataPersisterCommande implements DataPersisterInterface
      */
     public function persist($data, array $context = [])
     { 
+        
         if ($data instanceof Commande) {
             $data->setClient($this->tokenStorage->getToken()->getUser());
+            // dd($data);
+            // $data->setClient($this->tokenStorage->getToken()->getUser());
         }
 
         if ($data instanceof Commande) {

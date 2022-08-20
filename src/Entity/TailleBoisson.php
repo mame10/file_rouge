@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\TailleBoissonRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,6 +11,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: TailleBoissonRepository::class)]
+#[ApiResource(
+    
+)]
 class TailleBoisson
 {
     #[ORM\Id]
@@ -28,7 +32,7 @@ class TailleBoisson
     private ?Boisson $boisson = null;
 
     #[ORM\ManyToOne(inversedBy: 'tailleBoissons')]
-    #[Groups('commande','boisson:read:all')]
+    #[Groups('boisson:read:all')]
     private ?Taille $taille = null;
 
     #[ORM\OneToMany(mappedBy: 'boisson', targetEntity: CommandeTailleBoisson::class,cascade:['persist'])]
@@ -93,7 +97,7 @@ class TailleBoisson
     {
         if (!$this->commandeTailleBoissons->contains($commandeTailleBoisson)) {
             $this->commandeTailleBoissons->add($commandeTailleBoisson);
-            $commandeTailleBoisson->setBoisson($this);
+            $commandeTailleBoisson->setTailleBoisson($this);
         }
 
         return $this;
@@ -103,8 +107,8 @@ class TailleBoisson
     {
         if ($this->commandeTailleBoissons->removeElement($commandeTailleBoisson)) {
             // set the owning side to null (unless already changed)
-            if ($commandeTailleBoisson->getBoisson() === $this) {
-                $commandeTailleBoisson->setBoisson(null);
+            if ($commandeTailleBoisson->getTailleBoisson() === $this) {
+                $commandeTailleBoisson->setTailleBoisson(null);
             }
         }
 

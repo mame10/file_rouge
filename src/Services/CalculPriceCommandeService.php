@@ -12,7 +12,8 @@ class CalculPriceCommandeService implements ICalculPriceCommandeService
 
     public function PriceCommande(Commande $data): float
     {
-        $prix = $data->getZone->getPrix();
+        // dd($data)
+        $prix =$data->getZone()->getPrix();
         foreach ($data->getBurgerCommandes() as $burger) {
             $cmd = $burger->getBurger();
             $prix += $cmd->getPrix() * $burger->getQuantity();
@@ -24,7 +25,8 @@ class CalculPriceCommandeService implements ICalculPriceCommandeService
             $prix += $portion->getPortions()->getPrix() * $portion->getQuantite();
         }
         foreach ($data->getCommandeTailleBoissons() as $boisson) {
-            $prix += $boisson->getBoisson()->getTaille()->getPrix() * $boisson->getQuantiteCommande();
+            $prix += $boisson->getTailleBoisson()->getTaille()->getPrix() * $boisson->getQuantiteCommande();
+            // dd($prix);
         }
         return $prix;
     }

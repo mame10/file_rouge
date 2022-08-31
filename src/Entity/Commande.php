@@ -36,23 +36,23 @@ class Commande
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups('commande','comande:read')]
+    #[Groups('commande','comande:read','user:read:all')]
     private $id;
 
     #[ORM\Column(type: 'string')]
-    #[Groups('comande:read')]
+    #[Groups('comande:read','user:read:all')]
     private $numero;
 
     #[ORM\Column(type: 'date', length: 255)]
-    #[Groups('comande:read')]
+    #[Groups('comande:read','user:read:all')]
     private $date;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups('comande:read')]
+    #[Groups('comande:read','user:read:all')]
     private $etat = 'En_cours';
 
     #[ORM\Column(type: 'integer')]
-    #[Groups('comande:read')]
+    #[Groups('comande:read','user:read:all')]
     private $montant;
 
     #[ORM\OneToMany(mappedBy: 'commandes', targetEntity: BurgerCommande::class, cascade: ['persist'])]

@@ -29,7 +29,12 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
             'normalization_context' => ['groups' => ['user:read:all']]
         ]
     ],
-    itemOperations: ["put", "get"]
+    itemOperations: ["put",
+     "get" => [
+        "method" => "get",
+        'normalization_context' => ['groups' => ['user:read:all']]
+     ]
+     ]
 )]
 
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -37,7 +42,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(["burger:read:all", "user:read:simple", "write",'user:write','commande','liv'])]
+    #[Groups(["burger:read:all", "user:read:simple", "write",'user:write','commande','liv','livraison'])]
     protected $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
@@ -53,11 +58,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     protected $password;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(["user:read:simple", "user:read:all", "write",'user:write','liv'])]
+    #[Groups(["user:read:simple", "user:read:all", "write",'user:write','liv','livraison'])]
     protected $nom;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(["user:read:simple", "user:read:all", "write",'user:write','liv'])]
+    #[Groups(["user:read:simple", "user:read:all", "write",'user:write','liv','livraison'])]
     protected $prenom;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]

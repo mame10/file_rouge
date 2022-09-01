@@ -14,6 +14,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
     collectionOperations: [
         "get"=> [
             "method" => "get",
+            "security" => "is_granted('ROLE_GESTIONNAIRE')",
+            "security_message" => "Vous n'avez pas access à cette Ressource",
             "normalization_context" =>['groups' => ['write']]
         ],
         "post" => [
@@ -30,7 +32,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Livreur extends User
 {
 
-    #[Groups(['liv','write'])]
+    #[Groups(['liv','write','livraison'])]
     #[ORM\Column(type: 'string', length: 255)]
     private $telephone;
 
@@ -39,7 +41,7 @@ class Livreur extends User
     private $etat = 'disponible';
 
     #[ORM\Column(length: 255)]
-    #[Groups(['liv','write'])]
+    #[Groups(['liv','write','livraison'])]
     private ?string $matricule = null;
 
     public function __construct()

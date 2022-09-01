@@ -69,6 +69,5 @@ class DataPersisterProduit implements DataPersisterInterface
         $this->entityManager->remove($data);
         $this->entityManager->flush();
     }
-
     
 }

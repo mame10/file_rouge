@@ -36,23 +36,23 @@ class Commande
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups('commande','comande:read','user:read:all')]
+    #[Groups('commande','comande:read','user:read:all','livraison','livraison:all')]
     private $id;
 
     #[ORM\Column(type: 'string')]
-    #[Groups('comande:read','user:read:all')]
+    #[Groups('comande:read','user:read:all','livraison','livraison:all')]
     private $numero;
 
     #[ORM\Column(type: 'date', length: 255)]
-    #[Groups('comande:read','user:read:all')]
+    #[Groups('comande:read','user:read:all','livraison','livraison:all')]
     private $date;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups('comande:read','user:read:all')]
+    #[Groups('comande:read','user:read:all','livraison:all')]
     private $etat = 'En_cours';
 
     #[ORM\Column(type: 'integer')]
-    #[Groups('comande:read','user:read:all')]
+    #[Groups('comande:read','user:read:all','livraison')]
     private $montant;
 
     #[ORM\OneToMany(mappedBy: 'commandes', targetEntity: BurgerCommande::class, cascade: ['persist'])]
@@ -85,6 +85,10 @@ class Commande
     #[ORM\ManyToOne(inversedBy: 'commandes')]
     private ?User $user = null;
 
+    #[ORM\OneToMany(mappedBy: 'commande', targetEntity: Livraison::class)]
+    #[Groups('commande','comande:read')]
+    private Collection $livraison;
+
     public function __construct()
     {
         $this->burgerCommandes = new ArrayCollection();
@@ -94,6 +98,7 @@ class Commande
         $this->commandeTailleBoissons = new ArrayCollection();
         $this->date = new \DateTime();
         $this->numero = "NUM" . date('ymdhis');
+        $this->livraison = new ArrayCollection();
     }
     public function getId(): ?int
     {
@@ -237,8 +242,7 @@ class Commande
 
         return $this;
     }
-
-   
+  
     public function getClient(): ?Client
     {
         return $this->client;
@@ -250,8 +254,6 @@ class Commande
 
         return $this;
     }
-
-   
 
     public function getGestionnaire(): ?Gestionnaire
     {
@@ -317,4 +319,35 @@ class Commande
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Livraison>
+     */
+    public function getLivraison(): Collection
+    {
+        return $this->livraison;
+    }
+
+    public function addLivraison(Livraison $livraison): self
+    {
+        if (!$this->livraison->contains($livraison)) {
+            $this->livraison->add($livraison);
+            $livraison->setCommande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLivraison(Livraison $livraison): self
+    {
+        if ($this->livraison->removeElement($livraison)) {
+            // set the owning side to null (unless already changed)
+            if ($livraison->getCommande() === $this) {
+                $livraison->setCommande(null);
+            }
+        }
+
+        return $this;
+    }
+
 }
